@@ -12,6 +12,7 @@ import {
   AdMobInterstitial,
   AdMobRewarded,
   PublisherBanner,
+  PublisherNativeAd
 } from 'react-native-admob';
 
 const BannerExample = ({ style, title, children, ...props }) => (
@@ -32,75 +33,77 @@ export default class Example extends Component {
   }
 
   componentDidMount() {
-    AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
-    AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
+    /*    AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
+        AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
 
-    AdMobRewarded.addEventListener('rewarded', reward =>
-      console.log('AdMobRewarded => rewarded', reward),
-    );
-    AdMobRewarded.addEventListener('adLoaded', () =>
-      console.log('AdMobRewarded => adLoaded'),
-    );
-    AdMobRewarded.addEventListener('adFailedToLoad', error =>
-      console.warn(error),
-    );
-    AdMobRewarded.addEventListener('adOpened', () =>
-      console.log('AdMobRewarded => adOpened'),
-    );
-    AdMobRewarded.addEventListener('videoStarted', () =>
-      console.log('AdMobRewarded => videoStarted'),
-    );
-    AdMobRewarded.addEventListener('adClosed', () => {
-      console.log('AdMobRewarded => adClosed');
-      AdMobRewarded.requestAd().catch(error => console.warn(error));
-    });
-    AdMobRewarded.addEventListener('adLeftApplication', () =>
-      console.log('AdMobRewarded => adLeftApplication'),
-    );
+        AdMobRewarded.addEventListener('rewarded', reward =>
+          console.log('AdMobRewarded => rewarded', reward),
+        );
+        AdMobRewarded.addEventListener('adLoaded', () =>
+          console.log('AdMobRewarded => adLoaded'),
+        );
+        AdMobRewarded.addEventListener('adFailedToLoad', error =>
+          console.warn(error),
+        );
+        AdMobRewarded.addEventListener('adOpened', () =>
+          console.log('AdMobRewarded => adOpened'),
+        );
+        AdMobRewarded.addEventListener('videoStarted', () =>
+          console.log('AdMobRewarded => videoStarted'),
+        );
+        AdMobRewarded.addEventListener('adClosed', () => {
+          console.log('AdMobRewarded => adClosed');
+          AdMobRewarded.requestAd().catch(error => console.warn(error));
+        });
+        AdMobRewarded.addEventListener('adLeftApplication', () =>
+          console.log('AdMobRewarded => adLeftApplication'),
+        );
 
-    AdMobRewarded.requestAd().catch(error => console.warn(error));
+        AdMobRewarded.requestAd().catch(error => console.warn(error));
 
-    AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
-    AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712');
+        AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
+        AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712');
 
-    AdMobInterstitial.addEventListener('adLoaded', () =>
-      console.log('AdMobInterstitial adLoaded'),
-    );
-    AdMobInterstitial.addEventListener('adFailedToLoad', error =>
-      console.warn(error),
-    );
-    AdMobInterstitial.addEventListener('adOpened', () =>
-      console.log('AdMobInterstitial => adOpened'),
-    );
-    AdMobInterstitial.addEventListener('adClosed', () => {
-      console.log('AdMobInterstitial => adClosed');
-      AdMobInterstitial.requestAd().catch(error => console.warn(error));
-    });
-    AdMobInterstitial.addEventListener('adLeftApplication', () =>
-      console.log('AdMobInterstitial => adLeftApplication'),
-    );
+        AdMobInterstitial.addEventListener('adLoaded', () =>
+          console.log('AdMobInterstitial adLoaded'),
+        );
+        AdMobInterstitial.addEventListener('adFailedToLoad', error =>
+          console.warn(error),
+        );
+        AdMobInterstitial.addEventListener('adOpened', () =>
+          console.log('AdMobInterstitial => adOpened'),
+        );
+        AdMobInterstitial.addEventListener('adClosed', () => {
+          console.log('AdMobInterstitial => adClosed');
+          AdMobInterstitial.requestAd().catch(error => console.warn(error));
+        });
+        AdMobInterstitial.addEventListener('adLeftApplication', () =>
+          console.log('AdMobInterstitial => adLeftApplication'),
+        );
 
-    AdMobInterstitial.requestAd().catch(error => console.warn(error));
+        AdMobInterstitial.requestAd().catch(error => console.warn(error));*/
   }
 
   componentWillUnmount() {
-    AdMobRewarded.removeAllListeners();
-    AdMobInterstitial.removeAllListeners();
+    // AdMobRewarded.removeAllListeners();
+    // AdMobInterstitial.removeAllListeners();
   }
 
   showRewarded() {
-    AdMobRewarded.showAd().catch(error => console.warn(error));
+    // AdMobRewarded.showAd().catch(error => console.warn(error));
   }
 
   showInterstitial() {
-    AdMobInterstitial.showAd().catch(error => console.warn(error));
+    // AdMobInterstitial.showAd().catch(error => console.warn(error));
   }
 
-  render() {
+  render() {//AdRequest.Builder.addTestDevice("B3EEABB8EE11C2BE770B684D95219ECB")
+    let testDevice = ["33BE2250B43518CCDA7DE426D04EE231", "B3EEABB8EE11C2BE770B684D95219ECB"];
     return (
       <View style={styles.container}>
         <ScrollView>
-          <BannerExample title="AdMob - Basic">
+      {/*
+        <BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="ca-app-pub-3940256099942544/2934735716"
@@ -146,16 +149,28 @@ export default class Example extends Component {
               onPress={() => this._adSizesExample.loadBanner()}
             />
           </BannerExample>
+          */}
           <BannerExample
             title="DFP - App Events"
             style={this.state.appEventsExampleStyle}>
-            <PublisherBanner
+              <Text>{this.state.ad ? this.state.ad.headline : null}</Text>
+              <Text>{this.state.ad ? this.state.ad.advertiser : null}</Text>
+              <Text>{this.state.ad ? this.state.ad.body : null}</Text>
+              <Text>{this.state.ad ? this.state.ad.callToAction : null}</Text>
+            <PublisherNativeAd
               style={{ height: 50 }}
-              adUnitID="/6499/example/APIDemo/AppEvents"
+              adUnitID="/6499/example/native"
               onAdFailedToLoad={error => {
-                console.warn(error);
+                console.log(error);
+              }}
+              onAdLoaded={ad => {
+                console.log(ad);
+                this.setState({
+                  ad: ad,
+                });
               }}
               onAppEvent={event => {
+                console.log(event);
                 if (event.name === 'color') {
                   this.setState({
                     appEventsExampleStyle: { backgroundColor: event.info },
@@ -170,6 +185,7 @@ export default class Example extends Component {
               style={styles.button}
             />
           </BannerExample>
+    {/*
           <BannerExample title="DFP - Fluid Ad Size">
             <View
               style={[
@@ -203,7 +219,7 @@ export default class Example extends Component {
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>
+          </BannerExample>*/}
         </ScrollView>
       </View>
     );

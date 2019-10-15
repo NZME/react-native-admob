@@ -1,4 +1,4 @@
-package com.example;
+package co.nz.adexample;
 
 import android.app.Application;
 import android.util.Log;

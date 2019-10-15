@@ -1,4 +1,4 @@
-package com.example;
+package co.nz.adexample;
 
 import com.facebook.react.ReactActivity;
 
