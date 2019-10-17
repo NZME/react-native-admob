@@ -1,16 +1,17 @@
 package com.sbugert.rnadmob;
 
 import androidx.annotation.Nullable;
-
-import android.app.Activity;
 import android.view.View;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ViewGroupManager;
+import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.bridge.ReactApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -20,10 +21,11 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
     public static final String REACT_CLASS = "RNDFPPublisherNativeAdView";
 
     public static final String PROP_AD_UNIT_ID = "adUnitID";
+    public static final String PROP_AD_STYLES = "adStyles";
     public static final String PROP_TEST_DEVICES = "testDevices";
 
     public static final String EVENT_AD_LOADED = "onAdLoaded";
-    public static final String EVENT_AD_CLICKED = "onAdClicked";
+    public static final String EVENT_SIZE_CHANGE = "onSizeChange";
     public static final String EVENT_AD_FAILED_TO_LOAD = "onAdFailedToLoad";
     public static final String EVENT_AD_OPENED = "onAdOpened";
     public static final String EVENT_AD_CLOSED = "onAdClosed";
@@ -37,15 +39,16 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
         return REACT_CLASS;
     }
 
-    private Activity mCurrentActivity;
+    private ReactApplicationContext applicationContext;
 
-    public RNPublisherNativeAdViewManager(Activity activity) {
-        mCurrentActivity = activity;
+    public RNPublisherNativeAdViewManager(ReactApplicationContext context) {
+        super();
+        this.applicationContext = context;
     }
 
     @Override
     protected ReactPublisherNativeAdView createViewInstance(ThemedReactContext themedReactContext) {
-        ReactPublisherNativeAdView adView = new ReactPublisherNativeAdView(themedReactContext, mCurrentActivity);
+        ReactPublisherNativeAdView adView = new ReactPublisherNativeAdView(themedReactContext, applicationContext);
         return adView;
     }
 
@@ -60,7 +63,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
         MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
         String[] events = {
                 EVENT_AD_LOADED,
-                EVENT_AD_CLICKED,
+                EVENT_SIZE_CHANGE,
                 EVENT_AD_FAILED_TO_LOAD,
                 EVENT_AD_OPENED,
                 EVENT_AD_CLOSED,
@@ -76,6 +79,11 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
     @ReactProp(name = PROP_AD_UNIT_ID)
     public void setPropAdUnitID(final ReactPublisherNativeAdView view, final String adUnitID) {
         view.setAdUnitID(adUnitID);
+    }
+
+    @ReactProp(name = PROP_AD_STYLES)
+    public void setPropAdStyles(final ReactPublisherNativeAdView view, final ReadableMap adStyles) {
+        view.setAdStyles(adStyles);
     }
 
     @ReactProp(name = PROP_TEST_DEVICES)

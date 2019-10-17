@@ -1,4 +1,4 @@
-import { arrayOf, func, string } from 'prop-types';
+import { arrayOf, func, string, object } from 'prop-types';
 import React, { Component } from 'react';
 import {
   findNodeHandle,
@@ -6,7 +6,8 @@ import {
   UIManager,
   ViewPropTypes,
   View,
-  Text
+  Text,
+  Button,
 } from 'react-native';
 import { createErrorFromErrorData } from './utils';
 
@@ -14,7 +15,7 @@ class PublisherNativeAd extends Component {
   constructor() {
     super();
     this.handleAdLoaded = this.handleAdLoaded.bind(this);
-    this.handleAdClicked = this.handleAdClicked.bind(this);
+    this.handleSizeChange = this.handleSizeChange.bind(this);
     this.handleAppEvent = this.handleAppEvent.bind(this);
     this.handleAdFailedToLoad = this.handleAdFailedToLoad.bind(this);
     this.state = {
@@ -29,7 +30,8 @@ class PublisherNativeAd extends Component {
   loadBanner() {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this._bannerView),
-      UIManager.getViewManagerConfig('RNDFPPublisherNativeAdView').Commands.loadBanner,
+      UIManager.getViewManagerConfig('RNDFPPublisherNativeAdView').Commands
+        .loadBanner,
       null
     );
   }
@@ -40,9 +42,11 @@ class PublisherNativeAd extends Component {
     }
   }
 
-  handleAdClicked(event) {
-    if (this.props.onAdClicked) {
-      this.props.onAdClicked(event.nativeEvent);
+  handleSizeChange(event) {
+    const { height, width } = event.nativeEvent;
+    this.setState({ style: { width, height } });
+    if (this.props.onSizeChange) {
+      this.props.onSizeChange({ width, height });
     }
   }
 
@@ -63,16 +67,15 @@ class PublisherNativeAd extends Component {
 
   render() {
     return (
-      <View><Text>sag</Text>
       <RNDFPPublisherNativeAdView
         {...this.props}
         style={[this.props.style, this.state.style]}
         onAdLoaded={this.handleAdLoaded}
-        onAdClicked={this.handleAdClicked}
+        onSizeChange={this.handleSizeChange}
         onAdFailedToLoad={this.handleAdFailedToLoad}
         onAppEvent={this.handleAppEvent}
         ref={(el) => (this._bannerView = el)}
-      /></View>
+      />
     );
   }
 }
@@ -88,6 +91,11 @@ PublisherNativeAd.propTypes = {
   adUnitID: string,
 
   /**
+   * DFP ad unit styles
+   */
+  adStyles: object,
+
+  /**
    * Array of test devices. Use PublisherNativeAd.simulatorId for the simulator
    */
   testDevices: arrayOf(string),
@@ -96,7 +104,7 @@ PublisherNativeAd.propTypes = {
    * DFP library events
    */
   onAdLoaded: func,
-  onAdClicked: func,
+  onSizeChange: func,
   onAdFailedToLoad: func,
   onAdOpened: func,
   onAdClosed: func,

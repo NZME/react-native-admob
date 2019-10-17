@@ -14,5 +14,5 @@ module.exports = {
   },
   get PublisherNativeAd() {
     return require('./RNPublisherNativeAd').default;
-  }
+  },
 };

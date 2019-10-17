@@ -4,51 +4,60 @@ import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.Nullable;
 import android.view.View;
+import android.graphics.Color;
+import android.view.Choreographer;
+import android.view.LayoutInflater;
+import android.widget.TextView;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.view.ReactViewGroup;
+
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.gms.ads.formats.MediaView;
-import android.widget.TextView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
 import com.google.android.gms.ads.VideoController;
 import com.google.android.gms.ads.VideoOptions;
-
 import com.google.android.gms.ads.formats.NativeAdOptions;
 
-class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener {
+
+class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener {
     protected AdLoader adLoader;
-
     protected WritableMap ad;
-
     protected UnifiedNativeAdView adView;
-    protected Activity mCurrentActivity;
+    protected ReactApplicationContext applicationContext;
 
     String[] testDevices;
+    ReadableMap adStyles;
     String adUnitID;
 
-    public ReactPublisherNativeAdView(final Context context, Activity mCurrentActivity) {
+    public ReactPublisherNativeAdView(final ThemedReactContext context, ReactApplicationContext applicationContext) {
         super(context);
-        this.mCurrentActivity = mCurrentActivity;
+        this.applicationContext = applicationContext;
+        this.applicationContext.addLifecycleEventListener(this);
+        this.requestLayout();
+        setupLayoutHack();
+
         this.createAdView();
     }
 
     private void processUnifiedNativeAd(UnifiedNativeAd unifiedNativeAd) {
-        // Show the ad.
-
         ad = Arguments.createMap();
 
         if (unifiedNativeAd.getHeadline() == null) {
@@ -118,86 +127,172 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             }
             ad.putArray("images", images);
         }
-
-        adView.setNativeAd(unifiedNativeAd);
-        this.removeAllViews();
-        this.addView(this.adView);
     }
 
-    private void populateUnifiedNativeAdView(UnifiedNativeAd nativeAd, UnifiedNativeAdView adView) {
-        // Set the media view.
-        adView.setMediaView((MediaView) adView.findViewById(R.id.ad_media));
+    private void applyStyle(View view, ReadableMap styles) {
+        if (styles.hasKey("backgroundColor") && styles.getString("backgroundColor") != null) {
+            int backgroundColor = Color.parseColor(styles.getString("backgroundColor"));
+            view.setBackgroundColor(backgroundColor);
+        }
+        if (styles.hasKey("padding")) {
+            Float padding = PixelUtil.toPixelFromDIP(styles.getInt("padding"));
+            view.setPadding(padding.intValue(), padding.intValue(), padding.intValue(), padding.intValue());
+        }
+        if (styles.hasKey("width")) {
+            Float width = PixelUtil.toPixelFromDIP(styles.getInt("width"));
+            view.getLayoutParams().width = width.intValue();
+        }
+        if (styles.hasKey("height")) {
+            Float height = PixelUtil.toPixelFromDIP(styles.getInt("height"));
+            view.getLayoutParams().height = height.intValue();
+        }
+        if (view instanceof TextView) {
+            if (styles.hasKey("color") && styles.getString("color") != null) {
+                int color = Color.parseColor(styles.getString("color"));
+                ((TextView) view).setTextColor(color);
+            }
+            if (styles.hasKey("fontSize")) {
+                int fontSize = styles.getInt("fontSize");
+                ((TextView) view).setTextSize(fontSize);
+            }
+        }
+    }
+
+    private void populateUnifiedNativeAdView(UnifiedNativeAd nativeAd, UnifiedNativeAdView nativeAdView) {
+        MediaView adMediaView = (MediaView) nativeAdView.findViewById(R.id.ad_media);
+        if (adMediaView != null && nativeAd.getMediaContent() != null) {
+            // Set the media view.
+            nativeAdView.setMediaView(adMediaView);
+            nativeAdView.getMediaView().setMediaContent(nativeAd.getMediaContent());
+        }
 
         // Set other ad assets.
-        adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
-        adView.setBodyView(adView.findViewById(R.id.ad_body));
-        adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
-        adView.setIconView(adView.findViewById(R.id.ad_app_icon));
-        adView.setPriceView(adView.findViewById(R.id.ad_price));
-        adView.setStarRatingView(adView.findViewById(R.id.ad_stars));
-        adView.setStoreView(adView.findViewById(R.id.ad_store));
-        adView.setAdvertiserView(adView.findViewById(R.id.ad_advertiser));
 
-        // The headline and mediaContent are guaranteed to be in every UnifiedNativeAd.
-        ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
-        adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
+        TextView adHeadlineView = (TextView) nativeAdView.findViewById(R.id.ad_headline);
+        if (adHeadlineView != null) {
+            if (this.adStyles.hasKey("ad_headline")) {
+                applyStyle(adHeadlineView, this.adStyles.getMap("ad_headline"));
+            }
+            nativeAdView.setHeadlineView(adHeadlineView);
+            if (nativeAd.getHeadline() != null) {
+                // The headline and mediaContent are guaranteed to be in every UnifiedNativeAd.
+                ((TextView) nativeAdView.getHeadlineView()).setText(nativeAd.getHeadline());
+            } else {
+                nativeAdView.getHeadlineView().setVisibility(View.INVISIBLE);
+            }
+        }
 
+        // Set other ad assets.
         // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to
         // check before trying to display them.
-        if (nativeAd.getBody() == null) {
-            adView.getBodyView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getBodyView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
+        TextView adBodyView = (TextView) nativeAdView.findViewById(R.id.ad_body);
+        if (adBodyView != null ) {
+            if (this.adStyles.hasKey("ad_body")) {
+                applyStyle(adBodyView, this.adStyles.getMap("ad_body"));
+            }
+            nativeAdView.setBodyView(adBodyView);
+            if (nativeAd.getBody() == null) {
+                nativeAdView.getBodyView().setVisibility(View.INVISIBLE);
+            } else {
+                nativeAdView.getBodyView().setVisibility(View.VISIBLE);
+                ((TextView) nativeAdView.getBodyView()).setText(nativeAd.getBody());
+            }
         }
 
-        if (nativeAd.getCallToAction() == null) {
-            adView.getCallToActionView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getCallToActionView().setVisibility(View.VISIBLE);
-            ((Button) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        View adCallToActionView = (View) nativeAdView.findViewById(R.id.ad_call_to_action);
+        if (adCallToActionView != null) {
+            if (this.adStyles.hasKey("ad_call_to_action")) {
+                applyStyle(adCallToActionView, this.adStyles.getMap("ad_call_to_action"));
+            }
+            nativeAdView.setCallToActionView(adCallToActionView);
+            if (nativeAd.getCallToAction() == null) {
+                nativeAdView.getCallToActionView().setVisibility(View.INVISIBLE);
+            } else {
+                nativeAdView.getCallToActionView().setVisibility(View.VISIBLE);
+
+                TextView adCallToActionTextView = (TextView) nativeAdView.findViewById(R.id.ad_call_to_action_text);
+                if (adCallToActionTextView != null) {
+                    adCallToActionTextView.setText(nativeAd.getCallToAction());
+                }
+            }
         }
 
-        if (nativeAd.getIcon() == null) {
-            adView.getIconView().setVisibility(View.GONE);
-        } else {
-            ((ImageView) adView.getIconView()).setImageDrawable(
-                    nativeAd.getIcon().getDrawable());
-            adView.getIconView().setVisibility(View.VISIBLE);
+        ImageView adAppIconView = (ImageView) nativeAdView.findViewById(R.id.ad_app_icon);
+        if (adAppIconView != null ) {
+            if (this.adStyles.hasKey("ad_app_icon")) {
+                applyStyle(adAppIconView, this.adStyles.getMap("ad_app_icon"));
+            }
+            nativeAdView.setIconView(adAppIconView);
+            if (nativeAd.getIcon() == null) {
+                nativeAdView.getIconView().setVisibility(View.GONE);
+            } else {
+                ((ImageView) nativeAdView.getIconView()).setImageDrawable(
+                        nativeAd.getIcon().getDrawable());
+                nativeAdView.getIconView().setVisibility(View.VISIBLE);
+            }
         }
 
-        if (nativeAd.getPrice() == null) {
-            adView.getPriceView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getPriceView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getPriceView()).setText(nativeAd.getPrice());
+        TextView adPriceView = (TextView) nativeAdView.findViewById(R.id.ad_price);
+        if (adPriceView != null ) {
+            if (this.adStyles.hasKey("ad_price")) {
+                applyStyle(adPriceView, this.adStyles.getMap("ad_price"));
+            }
+            nativeAdView.setPriceView(adPriceView);
+            if (nativeAd.getPrice() == null) {
+                nativeAdView.getPriceView().setVisibility(View.INVISIBLE);
+            } else {
+                nativeAdView.getPriceView().setVisibility(View.VISIBLE);
+                ((TextView) nativeAdView.getPriceView()).setText(nativeAd.getPrice());
+            }
         }
 
-        if (nativeAd.getStore() == null) {
-            adView.getStoreView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getStoreView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getStoreView()).setText(nativeAd.getStore());
+        RatingBar adStarsView = (RatingBar) nativeAdView.findViewById(R.id.ad_stars);
+        if (adStarsView != null ) {
+            if (this.adStyles.hasKey("ad_stars")) {
+                applyStyle(adStarsView, this.adStyles.getMap("ad_stars"));
+            }
+            nativeAdView.setStarRatingView(adStarsView);
+            if (nativeAd.getStarRating() == null) {
+                nativeAdView.getStarRatingView().setVisibility(View.INVISIBLE);
+            } else {
+                ((RatingBar) nativeAdView.getStarRatingView())
+                        .setRating(nativeAd.getStarRating().floatValue());
+                nativeAdView.getStarRatingView().setVisibility(View.VISIBLE);
+            }
         }
 
-        if (nativeAd.getStarRating() == null) {
-            adView.getStarRatingView().setVisibility(View.INVISIBLE);
-        } else {
-            ((RatingBar) adView.getStarRatingView())
-                    .setRating(nativeAd.getStarRating().floatValue());
-            adView.getStarRatingView().setVisibility(View.VISIBLE);
+        TextView adStoreView = (TextView) nativeAdView.findViewById(R.id.ad_store);
+        if (adStoreView != null ) {
+            if (this.adStyles.hasKey("ad_store")) {
+                applyStyle(adStoreView, this.adStyles.getMap("ad_store"));
+            }
+            nativeAdView.setStoreView(adStoreView);
+            if (nativeAd.getStore() == null) {
+                nativeAdView.getStoreView().setVisibility(View.INVISIBLE);
+            } else {
+                nativeAdView.getStoreView().setVisibility(View.VISIBLE);
+                ((TextView) nativeAdView.getStoreView()).setText(nativeAd.getStore());
+            }
         }
 
-        if (nativeAd.getAdvertiser() == null) {
-            adView.getAdvertiserView().setVisibility(View.INVISIBLE);
-        } else {
-            ((TextView) adView.getAdvertiserView()).setText(nativeAd.getAdvertiser());
-            adView.getAdvertiserView().setVisibility(View.VISIBLE);
+        TextView adAdvertiserView = (TextView) nativeAdView.findViewById(R.id.ad_advertiser);
+        if (adAdvertiserView != null ) {
+            if (this.adStyles.hasKey("ad_advertiser")) {
+                applyStyle(adAdvertiserView, this.adStyles.getMap("ad_advertiser"));
+            }
+            nativeAdView.setAdvertiserView(adAdvertiserView);
+            if (nativeAd.getAdvertiser() == null) {
+                nativeAdView.getAdvertiserView().setVisibility(View.INVISIBLE);
+            } else {
+                ((TextView) nativeAdView.getAdvertiserView()).setText(nativeAd.getAdvertiser());
+                nativeAdView.getAdvertiserView().setVisibility(View.VISIBLE);
+            }
         }
+
 
         // This method tells the Google Mobile Ads SDK that you have finished populating your
         // native ad view with this native ad.
-        adView.setNativeAd(nativeAd);
+        nativeAdView.setNativeAd(nativeAd);
 
         // Get the video controller for the ad. One will always be provided, even if the ad doesn't
         // have a video asset.
@@ -219,11 +314,63 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
     }
 
+    private void fixLayout() {
+        if (this.adView != null) {
+            int viewWidth;
+            int viewHeight;
+
+            viewWidth = this.getMeasuredWidth();
+            viewHeight = this.getMeasuredHeight();
+
+            int minHeight = 200;
+            if (viewHeight < minHeight) {
+                viewHeight = minHeight;
+                this.setMinimumHeight(viewHeight);
+            }
+
+            int left = this.adView.getLeft();
+            int top = this.adView.getTop();
+            this.adView.measure(viewWidth, viewHeight);
+            this.adView.layout(left, top, left + viewWidth, top + viewHeight);
+
+            sendOnSizeChangeEvent();
+        }
+    }
+
+    private void setupLayoutHack() {
+
+        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
+            @Override
+            public void doFrame(long frameTimeNanos) {
+                manuallyLayoutChildren();
+                getViewTreeObserver().dispatchOnGlobalLayout();
+                Choreographer.getInstance().postFrameCallback(this);
+            }
+        });
+    }
+
+    private void manuallyLayoutChildren() {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+            child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
+        }
+    }
+
+    private void sendOnSizeChangeEvent() {
+        WritableMap event = Arguments.createMap();
+        int width = this.adView.getWidth();
+        int height = this.adView.getHeight();
+
+        event.putDouble("width", PixelUtil.toDIPFromPixel(width));
+        event.putDouble("height", PixelUtil.toDIPFromPixel(height));
+        sendEvent(RNPublisherNativeAdViewManager.EVENT_SIZE_CHANGE, event);
+    }
+
     private void createAdView() {
         final Context context = getContext();
-
-        if (this.adView != null) this.adView.destroy();
-        this.adView = new UnifiedNativeAdView(context);
+        final ReactPublisherNativeAdView parent = this;
 
         VideoOptions videoOptions = new VideoOptions.Builder()
                 .setStartMuted(true)
@@ -237,16 +384,16 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
                 .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
                     @Override
                     public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-//                        UnifiedNativeAdView adView = new UnifiedNativeAdView(context);
+                        if (adView != null) adView.destroy();
 
-                        UnifiedNativeAdView adView = (UnifiedNativeAdView) mCurrentActivity.getLayoutInflater()
-                                .inflate(R.layout.ad_unified, null);
-                        System.out.println(adView);
+                        LayoutInflater inflater = LayoutInflater.from(context);
+                        adView = (UnifiedNativeAdView) inflater.inflate(R.layout.ad_small, parent, false);
+
                         populateUnifiedNativeAdView(unifiedNativeAd, adView);
-//                        removeAllViews();
-                        addView(adView);
 
-//                        processUnifiedNativeAd(unifiedNativeAd);
+                        removeAllViews();
+                        addView(adView);
+                        fixLayout();
                     }
                 })
                 .withAdListener(new AdListener() {
@@ -276,13 +423,12 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
                     @Override
                     public void onAdLoaded() {
-                        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, ad);
+                        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, null);
                     }
 
                     @Override
                     public void onAdClicked() {
                         // Log the click event or other custom behavior.
-                        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_CLICKED, null);
                     }
 
                     @Override
@@ -336,6 +482,10 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
     }
 
+    public void setAdStyles(ReadableMap adStyles) {
+        this.adStyles = adStyles;
+    }
+
     public void setTestDevices(String[] testDevices) {
         this.testDevices = testDevices;
     }
@@ -346,5 +496,20 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         event.putString("name", name);
         event.putString("info", info);
         sendEvent(RNPublisherNativeAdViewManager.EVENT_APP_EVENT, event);
+    }
+
+    @Override
+    public void onHostResume() {
+    }
+
+    @Override
+    public void onHostPause() {
+    }
+
+    @Override
+    public void onHostDestroy() {
+        if (this.adView != null) {
+            this.adView.destroy();
+        }
     }
 }
