@@ -8,10 +8,11 @@
 
 @class RCTEventDispatcher;
 
-@interface RNDFPPublisherNativeAdView : RCTView <GADBannerViewDelegate, GADAppEventDelegate>
+@interface RNDFPPublisherNativeAdView : RCTView
 
 @property (nonatomic, copy) NSDictionary *adStyles;
 @property (nonatomic, copy) NSArray *testDevices;
+@property (nonatomic, copy) NSString *adUnitID;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onSizeChange;
 @property (nonatomic, copy) RCTBubblingEventBlock onAppEvent;

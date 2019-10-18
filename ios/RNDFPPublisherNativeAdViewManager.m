@@ -32,9 +32,9 @@ RCT_EXPORT_METHOD(loadBanner:(nonnull NSNumber *)reactTag)
     }];
 }
 
-RCT_REMAP_VIEW_PROPERTY(adUnitID, _bannerView.adUnitID, NSString)
 RCT_EXPORT_VIEW_PROPERTY(adStyles, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(testDevices, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(adUnitID, NSString)
 
 RCT_EXPORT_VIEW_PROPERTY(onSizeChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAppEvent, RCTBubblingEventBlock)

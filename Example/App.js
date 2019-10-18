@@ -34,7 +34,7 @@ export default class Example extends Component {
   }
 
   componentDidMount() {
-    AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
+    /*AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
     AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
 
     AdMobRewarded.addEventListener('rewarded', reward =>
@@ -82,7 +82,7 @@ export default class Example extends Component {
       console.log('AdMobInterstitial => adLeftApplication'),
     );
 
-    AdMobInterstitial.requestAd().catch(error => console.warn(error));
+    AdMobInterstitial.requestAd().catch(error => console.warn(error));*/
   }
 
   componentWillUnmount() {
@@ -102,7 +102,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          <BannerExample title="AdMob - Basic">
+      {/*<BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="ca-app-pub-3940256099942544/2934735716"
@@ -135,7 +135,7 @@ export default class Example extends Component {
               title="Show Interstitial and preload next"
               onPress={this.showInterstitial}
             />
-          </BannerExample>
+          </BannerExample>*/}
           <BannerExample
             title="DFP - Native ad">
             <PublisherNativeAd
@@ -153,7 +153,7 @@ export default class Example extends Component {
               style={styles.button}
             />
           </BannerExample>
-          <BannerExample title="DFP - Multiple Ad Sizes">
+    {/*<BannerExample title="DFP - Multiple Ad Sizes">
             <PublisherBanner
               adSize="banner"
               validAdSizes={['banner', 'largeBanner', 'mediumRectangle']}
@@ -222,7 +222,7 @@ export default class Example extends Component {
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>
+          </BannerExample>*/}
         </ScrollView>
       </View>
     );
