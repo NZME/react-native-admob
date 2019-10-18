@@ -139,7 +139,6 @@ export default class Example extends Component {
           <BannerExample
             title="DFP - Native ad">
             <PublisherNativeAd
-              style={{height:100}}
               adUnitID="/6499/example/native"
               adStyles={adStyles}
               onAdFailedToLoad={error => {

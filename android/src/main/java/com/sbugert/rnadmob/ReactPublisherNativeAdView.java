@@ -319,14 +319,10 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             int viewWidth;
             int viewHeight;
 
-            viewWidth = this.getMeasuredWidth();
-            viewHeight = this.getMeasuredHeight();
+            this.adView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 
-            int minHeight = 200;
-            if (viewHeight < minHeight) {
-                viewHeight = minHeight;
-                this.setMinimumHeight(viewHeight);
-            }
+            viewWidth = this.getMeasuredWidth();
+            viewHeight = this.adView.getMeasuredHeight();
 
             int left = this.adView.getLeft();
             int top = this.adView.getTop();
