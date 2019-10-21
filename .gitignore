@@ -70,6 +70,8 @@ Example/android/app/app.iml
 Example/.buckconfig
 Example/.vscode/
 Example/android/app/BUCK
+Example/yarn.lock
+Example/package-lock.json
 /yarn.lock
 package-lock.json
 .idea/*
