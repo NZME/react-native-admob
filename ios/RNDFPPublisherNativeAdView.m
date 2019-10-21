@@ -66,46 +66,31 @@
 //    UIViewController *rootViewController = [keyWindow rootViewController];
 //
 //    view.rootViewController = rootViewController;
-    
-
-    NSLog(@"-----------------------f");
-    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
-    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
-    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
-    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
 
     [self addSubview:view];
     
+    CGFloat subViewHeight = 0;
+    for (UIView *subview in view.subviews)
+    {
+        subViewHeight = subViewHeight + subview.frame.size.height;
+        
+        NSLog(@"subview: %@", subview);
+        NSLog(@"subview height: %f", subview.frame.size.height);
+    }
+    NSLog(@"all subview height: %f", subViewHeight);
+
     self.frame = CGRectMake(self.frame.origin.x,
                             self.frame.origin.y,
                             self.frame.size.width,
-                            view.bounds.size.height);
+                            self.frame.size.width/view.frame.size.width*subViewHeight);
     
     view.frame = self.bounds;
 
-    NSLog(@"-----------------------f");
-    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
-    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
-    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
-    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
-
     [self.nativeAdView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    
-    NSLog(@"-----------------------f");
-    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
-    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
-    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
-    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
-    
+
     NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
 //    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-
-    NSLog(@"-----------------------f");
-    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
-    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
-    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
-    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
 
     if (self.onSizeChange) {
         self.onSizeChange(@{
