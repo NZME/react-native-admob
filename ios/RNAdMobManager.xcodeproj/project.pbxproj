@@ -45,6 +45,7 @@
 		A4C80323235D41D000160D4F /* RNDFPPublisherNativeAdView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDFPPublisherNativeAdView.h; sourceTree = SOURCE_ROOT; };
 		A4C80324235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDFPPublisherNativeAdViewManager.m; sourceTree = SOURCE_ROOT; };
 		A4C80327235D41E100160D4F /* UnifiedNativeAdView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UnifiedNativeAdView.xib; sourceTree = SOURCE_ROOT; };
+		A4C8032B235D65EF00160D4F /* UnifiedNativeAdViewSmall.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UnifiedNativeAdViewSmall.xib; sourceTree = SOURCE_ROOT; };
 		A90F2F8A1D50AEF200F2A2E3 /* RNAdMobRewarded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNAdMobRewarded.h; sourceTree = SOURCE_ROOT; };
 		A90F2F8B1D50AEF200F2A2E3 /* RNAdMobRewarded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNAdMobRewarded.m; sourceTree = SOURCE_ROOT; };
 		A962C2511CB27DBD00E508A1 /* RNAdMobInterstitial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNAdMobInterstitial.h; sourceTree = SOURCE_ROOT; };
@@ -87,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				A4C80323235D41D000160D4F /* RNDFPPublisherNativeAdView.h */,
+				A4C8032B235D65EF00160D4F /* UnifiedNativeAdViewSmall.xib */,
 				A4C80322235D41D000160D4F /* RNDFPPublisherNativeAdView.m */,
 				A4C80321235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.h */,
 				A4C80324235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m */,
