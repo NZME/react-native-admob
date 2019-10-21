@@ -66,16 +66,47 @@
 //    UIViewController *rootViewController = [keyWindow rootViewController];
 //
 //    view.rootViewController = rootViewController;
+    
+
+    NSLog(@"-----------------------f");
+    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
+    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
+    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
+    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
+
     [self addSubview:view];
+    
+    self.frame = CGRectMake(self.frame.origin.x,
+                            self.frame.origin.y,
+                            self.frame.size.width,
+                            view.bounds.size.height);
+    
+    view.frame = self.bounds;
+
+    NSLog(@"-----------------------f");
+    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
+    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
+    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
+    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
 
     [self.nativeAdView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-    
+    NSLog(@"-----------------------f");
     NSLog(@"view.frame.size.width: %f", view.frame.size.width);
     NSLog(@"view.frame.size.height: %f", view.frame.size.height);
+    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
+    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
+    
+    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+
+    NSLog(@"-----------------------f");
+    NSLog(@"view.frame.size.width: %f", view.frame.size.width);
+    NSLog(@"view.frame.size.height: %f", view.frame.size.height);
+    NSLog(@"view.bounds.size.width: %f", view.bounds.size.width);
+    NSLog(@"view.bounds.size.height: %f", view.bounds.size.height);
+
     if (self.onSizeChange) {
         self.onSizeChange(@{
                             @"width": @(view.frame.size.width),
@@ -131,9 +162,7 @@
 
     // Create and place ad in view hierarchy.
     GADUnifiedNativeAdView *nativeAdView = [[NSBundle mainBundle] loadNibNamed:@"UnifiedNativeAdView" owner:nil options:nil].firstObject;
-    
-//    [self setAdView:nativeAdView];
-    
+
     nativeAdView.nativeAd = nativeAd;
     
     // Set ourselves as the ad delegate to be notified of native ad events.

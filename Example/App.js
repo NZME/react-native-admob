@@ -137,6 +137,7 @@ export default class Example extends Component {
             />
           </BannerExample>*/}
           <BannerExample
+            style={{ padding: 20, backgroundColor: '#FF0000' }}
             title="DFP - Native ad">
             <PublisherNativeAd
               adUnitID="/6499/example/native"
@@ -256,4 +257,7 @@ const styles = StyleSheet.create({
     margin: 10,
     fontSize: 20,
   },
+  button: {
+    backgroundColor: "#CC5500"
+  }
 });

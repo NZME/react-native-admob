@@ -11,6 +11,8 @@
 		0CB8C04E1D9143A6002BC3EF /* RNDFPBannerViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CB8C04D1D9143A6002BC3EF /* RNDFPBannerViewManager.m */; };
 		5E2419841FE11E0F00C6B738 /* RNAdMobUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2419831FE11E0F00C6B738 /* RNAdMobUtils.m */; };
 		5E86A6471F126FCE008013EB /* RCTConvert+GADAdSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E86A6461F126FCE008013EB /* RCTConvert+GADAdSize.m */; };
+		A4C80325235D41D000160D4F /* RNDFPPublisherNativeAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = A4C80322235D41D000160D4F /* RNDFPPublisherNativeAdView.m */; };
+		A4C80326235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A4C80324235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m */; };
 		A90F2F8C1D50AEF200F2A2E3 /* RNAdMobRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = A90F2F8B1D50AEF200F2A2E3 /* RNAdMobRewarded.m */; };
 		A962C2531CB27DBD00E508A1 /* RNAdMobInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = A962C2521CB27DBD00E508A1 /* RNAdMobInterstitial.m */; };
 		A96DA7841C146DA600FC639B /* RNGADBannerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A96DA7811C146DA600FC639B /* RNGADBannerView.m */; };
@@ -38,6 +40,11 @@
 		5E2419851FE11F1200C6B738 /* RNAdMobUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNAdMobUtils.h; sourceTree = SOURCE_ROOT; };
 		5E86A6451F126FCE008013EB /* RCTConvert+GADAdSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+GADAdSize.h"; sourceTree = SOURCE_ROOT; };
 		5E86A6461F126FCE008013EB /* RCTConvert+GADAdSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+GADAdSize.m"; sourceTree = SOURCE_ROOT; };
+		A4C80321235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDFPPublisherNativeAdViewManager.h; sourceTree = SOURCE_ROOT; };
+		A4C80322235D41D000160D4F /* RNDFPPublisherNativeAdView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDFPPublisherNativeAdView.m; sourceTree = SOURCE_ROOT; };
+		A4C80323235D41D000160D4F /* RNDFPPublisherNativeAdView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDFPPublisherNativeAdView.h; sourceTree = SOURCE_ROOT; };
+		A4C80324235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDFPPublisherNativeAdViewManager.m; sourceTree = SOURCE_ROOT; };
+		A4C80327235D41E100160D4F /* UnifiedNativeAdView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UnifiedNativeAdView.xib; sourceTree = SOURCE_ROOT; };
 		A90F2F8A1D50AEF200F2A2E3 /* RNAdMobRewarded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNAdMobRewarded.h; sourceTree = SOURCE_ROOT; };
 		A90F2F8B1D50AEF200F2A2E3 /* RNAdMobRewarded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNAdMobRewarded.m; sourceTree = SOURCE_ROOT; };
 		A962C2511CB27DBD00E508A1 /* RNAdMobInterstitial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNAdMobInterstitial.h; sourceTree = SOURCE_ROOT; };
@@ -79,6 +86,10 @@
 		A96DA7761C146D7200FC639B /* RNAdMobManager */ = {
 			isa = PBXGroup;
 			children = (
+				A4C80323235D41D000160D4F /* RNDFPPublisherNativeAdView.h */,
+				A4C80322235D41D000160D4F /* RNDFPPublisherNativeAdView.m */,
+				A4C80321235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.h */,
+				A4C80324235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m */,
 				0CB8C04C1D9143A6002BC3EF /* RNDFPBannerViewManager.h */,
 				0CB8C04D1D9143A6002BC3EF /* RNDFPBannerViewManager.m */,
 				A96DA7801C146DA600FC639B /* RNGADBannerView.h */,
@@ -95,6 +106,7 @@
 				A90F2F8B1D50AEF200F2A2E3 /* RNAdMobRewarded.m */,
 				5E86A6451F126FCE008013EB /* RCTConvert+GADAdSize.h */,
 				5E86A6461F126FCE008013EB /* RCTConvert+GADAdSize.m */,
+				A4C80327235D41E100160D4F /* UnifiedNativeAdView.xib */,
 			);
 			path = RNAdMobManager;
 			sourceTree = "<group>";
@@ -139,6 +151,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = A96DA76B1C146D7200FC639B;
@@ -158,11 +171,13 @@
 			files = (
 				A962C2531CB27DBD00E508A1 /* RNAdMobInterstitial.m in Sources */,
 				0CB8C04B1D913E00002BC3EF /* RNDFPBannerView.m in Sources */,
+				A4C80326235D41D000160D4F /* RNDFPPublisherNativeAdViewManager.m in Sources */,
 				A90F2F8C1D50AEF200F2A2E3 /* RNAdMobRewarded.m in Sources */,
 				A96DA7841C146DA600FC639B /* RNGADBannerView.m in Sources */,
 				A96DA7851C146DA600FC639B /* RNGADBannerViewManager.m in Sources */,
 				5E2419841FE11E0F00C6B738 /* RNAdMobUtils.m in Sources */,
 				5E86A6471F126FCE008013EB /* RCTConvert+GADAdSize.m in Sources */,
+				A4C80325235D41D000160D4F /* RNDFPPublisherNativeAdView.m in Sources */,
 				0CB8C04E1D9143A6002BC3EF /* RNDFPBannerViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
