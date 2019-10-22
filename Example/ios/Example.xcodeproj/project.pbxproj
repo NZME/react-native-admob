@@ -461,11 +461,13 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/UnifiedNativeAdView.xib",
+				"${PODS_ROOT}/../../../ios/UnifiedNativeAdView.xib",
+				"${PODS_ROOT}/../../../ios/UnifiedNativeAdViewSmall.xib",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UnifiedNativeAdView.nib",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UnifiedNativeAdViewSmall.nib",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

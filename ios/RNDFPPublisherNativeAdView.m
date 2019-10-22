@@ -11,21 +11,6 @@
 #import "RCTLog.h"
 #endif
 
-// <GADBannerViewDelegate, GADAppEventDelegate>
-
-@interface RNDFPPublisherNativeAdView () <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, GADVideoControllerDelegate>
-
-/// You must keep a strong reference to the GADAdLoader during the ad loading process.
-@property(nonatomic, strong) GADAdLoader *adLoader;
-
-/// The native ad that is being loaded.
-@property(nonatomic, strong) GADUnifiedNativeAd *nativeAd;
-
-/// The native ad view that is being presented.
-@property(nonatomic, strong) UIView *nativeAdView;
-
-@end
-
 @implementation RNDFPPublisherNativeAdView
 
 - (void)dealloc
@@ -250,46 +235,5 @@
         self.onAdLeftApplication(@{});
     }
 }
-
-/* TODO
- - (instancetype)initWithFrame:(CGRect)frame
- {
-     if ((self = [super initWithFrame:frame])) {
-         super.backgroundColor = [UIColor clearColor];
-
-         UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-         UIViewController *rootViewController = [keyWindow rootViewController];
-
-         _bannerView = [[DFPBannerView alloc] initWithAdSize:kGADAdSizeBanner];
-         _bannerView.delegate = self;
-         _bannerView.appEventDelegate = self;
-         _bannerView.rootViewController = rootViewController;
-         [self addSubview:_bannerView];
-     }
-
-     return self;
- }
-
-# pragma mark GADBannerViewDelegate
-
-/// Tells the delegate an ad request loaded an ad.
-- (void)adViewDidReceiveAd:(DFPBannerView *)adView
-{
-    if (self.onSizeChange) {
-        self.onSizeChange(@{
-                            @"width": @(adView.frame.size.width),
-                            @"height": @(adView.frame.size.height) });
-    }
-}
-
-# pragma mark GADAppEventDelegate
-
-- (void)adView:(GADBannerView *)banner didReceiveAppEvent:(NSString *)name withInfo:(NSString *)info
-{
-    if (self.onAppEvent) {
-        self.onAppEvent(@{ @"name": name, @"info": info });
-    }
-}
-*/
 
 @end
