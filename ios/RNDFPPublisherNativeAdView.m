@@ -49,9 +49,9 @@
                                        rootViewController:rootViewController
                                                   adTypes:adTypes
                                                   options:@[ videoOptions ]];
-    
+
     self.adLoader.delegate = self;
-    
+
     GADRequest *request = [GADRequest request];
     request.testDevices = _testDevices;
     [self.adLoader loadRequest:request];
@@ -61,19 +61,19 @@
     // Remove previous ad view.
     [self.nativeAdView removeFromSuperview];
     self.nativeAdView = view;
-    
+
 //    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
 //    UIViewController *rootViewController = [keyWindow rootViewController];
 //
 //    view.rootViewController = rootViewController;
 
     [self addSubview:view];
-    
+
     CGFloat subViewHeight = 0;
     for (UIView *subview in view.subviews)
     {
         subViewHeight = subViewHeight + subview.frame.size.height;
-        
+
         NSLog(@"subview: %@", subview);
         NSLog(@"subview height: %f", subview.frame.size.height);
     }
@@ -83,7 +83,7 @@
                             self.frame.origin.y,
                             self.frame.size.width,
                             self.frame.size.width/view.frame.size.width*subViewHeight);
-    
+
     view.frame = self.bounds;
 
     [self.nativeAdView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -146,18 +146,18 @@
     self.nativeAd = nativeAd;
 
     // Create and place ad in view hierarchy.
-    GADUnifiedNativeAdView *nativeAdView = [[NSBundle mainBundle] loadNibNamed:@"UnifiedNativeAdView" owner:nil options:nil].firstObject;
+    GADUnifiedNativeAdView *nativeAdView = [[NSBundle mainBundle] loadNibNamed:@"UnifiedNativeAdViewSmall" owner:nil options:nil].firstObject;
 
     nativeAdView.nativeAd = nativeAd;
-    
+
     // Set ourselves as the ad delegate to be notified of native ad events.
     nativeAd.delegate = self;
-    
+
     // Populate the native ad view with the native ad assets.
     // The headline and mediaContent are guaranteed to be present in every native ad.
     ((UILabel *)nativeAdView.headlineView).text = nativeAd.headline;
     nativeAdView.mediaView.mediaContent = nativeAd.mediaContent;
-    
+
     // This app uses a fixed width for the GADMediaView and changes its height
     // to match the aspect ratio of the media content it displays.
     if (nativeAd.mediaContent.aspectRatio > 0) {
@@ -176,16 +176,16 @@
         // receives messages about events in the video lifecycle.
         nativeAd.mediaContent.videoController.delegate = self;
     }
-    
+
     // These assets are not guaranteed to be present. Check that they are before
     // showing or hiding them.
     ((UILabel *)nativeAdView.bodyView).text = nativeAd.body;
     nativeAdView.bodyView.hidden = nativeAd.body ? NO : YES;
-    
-    [((UIButton *)nativeAdView.callToActionView) setTitle:nativeAd.callToAction
-                                               forState:UIControlStateNormal];
 
-    nativeAdView.callToActionView.hidden = nativeAd.callToAction ? NO : YES;
+//    [((UIButton *)nativeAdView.callToActionView) setTitle:nativeAd.callToAction
+//                                               forState:UIControlStateNormal];
+//
+//    nativeAdView.callToActionView.hidden = nativeAd.callToAction ? NO : YES;
 
     ((UIImageView *)nativeAdView.iconView).image = nativeAd.icon.image;
     nativeAdView.iconView.hidden = nativeAd.icon ? NO : YES;
@@ -269,7 +269,7 @@
 
      return self;
  }
- 
+
 # pragma mark GADBannerViewDelegate
 
 /// Tells the delegate an ad request loaded an ad.
