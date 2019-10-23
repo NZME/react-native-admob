@@ -5,9 +5,8 @@ import {
   requireNativeComponent,
   UIManager,
   ViewPropTypes,
-  View,
-  Text,
-  Button,
+  processColor,
+  StyleSheet,
 } from 'react-native';
 import { createErrorFromErrorData } from './utils';
 
@@ -65,10 +64,39 @@ class PublisherNativeAd extends Component {
     }
   }
 
+  recursivelyProcessStyles(obj) {
+    var newObj = {};
+    var colors = ["color", "backgroundColor"];
+    for (var k in obj) {
+      if (typeof obj[k] == "object" && obj[k] !== null) {
+        newObj[k] = this.recursivelyProcessStyles(obj[k]);
+      } else if (colors.includes(k)) {
+        newObj[k] = processColor(obj[k]);
+      } else {
+        newObj[k] = obj[k];
+      }
+    }
+    return newObj;
+  }
+
+  getValidProps() {
+    if (Platform.OS === 'ios' && this.props.adStyles !== null) {
+      var props = {};
+      for (var k in this.props) {
+        props[k] = this.props[k]
+      }
+      props.adStyles = this.recursivelyProcessStyles(this.props.adStyles);
+      console.log(props.adStyles);
+    } else {
+      var props = this.props;
+    }
+    return props;
+  }
+
   render() {
     return (
       <RNDFPPublisherNativeAdView
-        {...this.props}
+        {...this.getValidProps()}
         style={[this.props.style, this.state.style]}
         onAdLoaded={this.handleAdLoaded}
         onSizeChange={this.handleSizeChange}

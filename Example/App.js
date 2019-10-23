@@ -5,8 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  Image
+  View
 } from 'react-native';
 import {
   AdMobBanner,
@@ -34,7 +33,7 @@ export default class Example extends Component {
   }
 
   componentDidMount() {
-    /*AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
+    AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
     AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
 
     AdMobRewarded.addEventListener('rewarded', reward =>
@@ -82,7 +81,7 @@ export default class Example extends Component {
       console.log('AdMobInterstitial => adLeftApplication'),
     );
 
-    AdMobInterstitial.requestAd().catch(error => console.warn(error));*/
+    AdMobInterstitial.requestAd().catch(error => console.warn(error));
   }
 
   componentWillUnmount() {
@@ -102,7 +101,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-      {/*<BannerExample title="AdMob - Basic">
+          <BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="ca-app-pub-3940256099942544/2934735716"
@@ -135,7 +134,7 @@ export default class Example extends Component {
               title="Show Interstitial and preload next"
               onPress={this.showInterstitial}
             />
-          </BannerExample>*/}
+          </BannerExample>
           <BannerExample
             style={{ padding: 20, backgroundColor: '#FF0000' }}
             title="DFP - Native ad">
@@ -154,7 +153,7 @@ export default class Example extends Component {
               style={styles.button}
             />
           </BannerExample>
-    {/*<BannerExample title="DFP - Multiple Ad Sizes">
+          <BannerExample title="DFP - Multiple Ad Sizes">
             <PublisherBanner
               adSize="banner"
               validAdSizes={['banner', 'largeBanner', 'mediumRectangle']}
@@ -223,28 +222,34 @@ export default class Example extends Component {
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>*/}
+          </BannerExample>
         </ScrollView>
       </View>
     );
   }
 }
 
-const adStyles = StyleSheet.create({
+const adStyles = {
   ad_headline: {
     padding:5,
     fontSize: 20,
+    textTransform: "uppercase",
+    color: "#0000FF",
+    //fontFamily
   },
   ad_body: {
     padding:5,
-    fontSize: 15,
+    fontSize: 20,
   },
   ad_app_icon: {
-    padding: 5,
+    padding: 20,
     width: 100,
     height: 100,
   },
-});
+  ad_call_to_action: {
+    backgroundColor: "#FFFFFF"
+  },
+};
 
 const styles = StyleSheet.create({
   container: {
