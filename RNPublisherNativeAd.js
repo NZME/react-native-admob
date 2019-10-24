@@ -7,6 +7,7 @@ import {
   ViewPropTypes,
   processColor,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import { createErrorFromErrorData } from './utils';
 
