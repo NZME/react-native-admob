@@ -1,18 +1,9 @@
-/* eslint-disable global-require */
-module.exports = {
-  get AdMobBanner() {
-    return require('./RNAdMobBanner').default;
-  },
-  get AdMobInterstitial() {
-    return require('./RNAdMobInterstitial').default;
-  },
-  get PublisherBanner() {
-    return require('./RNPublisherBanner').default;
-  },
-  get AdMobRewarded() {
-    return require('./RNAdMobRewarded').default;
-  },
-  get PublisherNativeAd() {
-    return require('./RNPublisherNativeAd').default;
-  },
-};
+export { default as AdMobBanner } from './src/RNAdMobBanner';
+export { default as AdMobInterstitial } from './src/RNAdMobInterstitial';
+export { default as PublisherBanner } from './src/RNPublisherBanner';
+export { default as AdMobRewarded } from './src/RNAdMobRewarded';
+export { default as PublisherNativeAd } from './src/RNPublisherNativeAd';
+
+export { default as NativeAdsManager } from './src/native-ads/NativeAdsManager';
+export { default as TriggerableView } from './src/native-ads/TriggerableViewManager';
+export { default as withNativeAd } from './src/native-ads/withNativeAd';
