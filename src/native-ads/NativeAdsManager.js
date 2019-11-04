@@ -1,5 +1,5 @@
 import { NativeModules, NativeEventEmitter } from 'react-native';
-import { EventEmitter } from 'fbemitter';
+// import { EventEmitter } from 'fbemitter';
 
 const RNNativeAdsManager = NativeModules.RNNativeAdsManager;
 
@@ -27,7 +27,7 @@ export default class NativeAdsManager {
   constructor(adUnitID, testDevices) {
     // Indicates whether AdsManager is ready to serve ads
     this.isValid = true;
-    this.eventEmitter = new EventEmitter();
+    // this.eventEmitter = new EventEmitter();
     this.adUnitID = adUnitID;
     //this.listenForStateChanges();
     //this.listenForErrors();
@@ -46,25 +46,25 @@ export default class NativeAdsManager {
    * Listens for AdManager state changes and updates internal state. When it changes,
    * callers will be notified of a change
    */
-  listenForStateChanges() {
-    nativeAdEmitter.addListener(eventMap.changed, (managers) => {
-      const isValidNow = managers[this.adUnitID];
-      if (this.isValid !== isValidNow && isValidNow) {
-        this.isValid = true;
-        this.eventEmitter.emit(eventMap.didBecomeValid);
-      }
-    });
-  }
+  // listenForStateChanges() {
+  //   nativeAdEmitter.addListener(eventMap.changed, (managers) => {
+  //     const isValidNow = managers[this.adUnitID];
+  //     if (this.isValid !== isValidNow && isValidNow) {
+  //       this.isValid = true;
+  //       this.eventEmitter.emit(eventMap.didBecomeValid);
+  //     }
+  //   });
+  // }
   /**
    * Listens for AdManager errors. When error occures,
    * callers will be notified of it
    */
-  listenForErrors() {
-    nativeAdEmitter.addListener(eventMap.onAdError, (error) => {
-      this.isValid = false;
-      this.eventEmitter.emit(eventMap.didBecomeInvalid, error);
-    });
-  }
+  // listenForErrors() {
+  //   nativeAdEmitter.addListener(eventMap.onAdError, (error) => {
+  //     this.isValid = false;
+  //     this.eventEmitter.emit(eventMap.didBecomeInvalid, error);
+  //   });
+  // }
   /**
    * Used to listening for state changes
    *
@@ -80,13 +80,13 @@ export default class NativeAdsManager {
         remove: () => { }
       };
     }
-    return this.eventEmitter.once(eventMap.didBecomeValid, func);
+    // return this.eventEmitter.once(eventMap.didBecomeValid, func);
   }
   /**
    * Used to listening for errors from this native ad manager
    */
   onAdsError(func) {
-    return this.eventEmitter.once(eventMap.didBecomeInvalid, func);
+    // return this.eventEmitter.once(eventMap.didBecomeInvalid, func);
   }
   /**
    * Set the native ads manager caching policy. This controls which media from
