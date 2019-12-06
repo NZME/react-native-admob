@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Dimensions, Image } from 'react-native';
+import { Text, View, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import {
   withNativeAd,
   TriggerableView,
@@ -41,43 +41,62 @@ const { width } = Dimensions.get('window');
     }
  */
 export class NativeAdView extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      nativeAd: props?.nativeAd,
+    };
+  }
+  onPress = () => {
+    console.log(this._triggerView);
+  };
+
   render() {
+    console.log('NativeAdView', this.props.nativeAd);
+    const { nativeAd } = this.state;
+    if (nativeAd?.type !== 'native') {
+      return null;
+    }
     return (
-      <View style={{ flexDirection: 'column', borderWidth: 1 }}>
-        <View>
-          <Image style={{ width: 80, height: 80 }} />
-          <Text>icon.uri: {this.props.nativeAd.icon.uri}</Text>
-          <View
-            style={{ flexDirection: 'column', paddingHorizontal: 10, flex: 1 }}
-          >
-            <TriggerableView style={{ fontSize: 18 }}>
-              headline: {this.props.nativeAd.headline}
-            </TriggerableView>
-            <Text>advertiserName: {this.props.nativeAd.advertiserName}</Text>
-            <Text>starRating: {this.props.nativeAd.starRating}</Text>
-            <Text>storeName: {this.props.nativeAd.storeName}</Text>
-            <Text>price: {this.props.nativeAd.price}</Text>
-            <TriggerableView style={{ fontSize: 10 }}>
-              bodyText: {this.props.nativeAd.bodyText}
-            </TriggerableView>
+      <View onPress={this.onPress} style={{ flexDirection: 'column', borderWidth: 1 }}>
+        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}}/>
+          <View>
+            <Image style={{ width: 80, height: 80 }} />
+            <Text>icon.uri: {nativeAd?.icon.uri}</Text>
+            <View
+              style={{ flexDirection: 'column', paddingHorizontal: 10, flex: 1 }}
+            >
+              <Text style={{ fontSize: 18 }}>
+                headline: {nativeAd?.headline}
+              </Text>
+              <Text>advertiserName: {nativeAd?.advertiserName}</Text>
+              <Text>starRating: {nativeAd?.starRating}</Text>
+              <Text>storeName: {nativeAd?.storeName}</Text>
+              <Text>price: {nativeAd?.price}</Text>
+              <Text style={{ fontSize: 10 }}>
+                bodyText: {nativeAd?.bodyText}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={{ alignItems: 'center' }}>
-          <TriggerableView
-            style={{
-              fontSize: 15,
-              color: '#a70f0a',
-              paddingVertical: 10,
-              paddingHorizontal: 30,
-              elevation: 3,
-              borderTopWidth: 0,
-              margin: 10,
-              borderRadius: 6,
-            }}
-          >
-            callToActionText: {this.props.nativeAd.callToActionText}
-          </TriggerableView>
-        </View>
+          <View style={{ alignItems: 'center' }}>
+            <View
+              ref={el => (this._triggerView = el)}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: '#a70f0a',
+                  paddingVertical: 10,
+                  paddingHorizontal: 30,
+                  elevation: 3,
+                  borderTopWidth: 0,
+                  margin: 10,
+                  borderRadius: 6,
+                }}
+              >
+                callToActionText: {nativeAd?.callToActionText}
+              </Text>
+            </View>
+          </View>
       </View>
     );
   }

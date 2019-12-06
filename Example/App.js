@@ -102,7 +102,8 @@ export default class Example extends Component {
   }
 
   render() {
-    const adsManager = new NativeAdsManager("/6499/example/native", [AdMobInterstitial.simulatorId]);
+    // const adsManager = new NativeAdsManager("/6499/example/native", [AdMobInterstitial.simulatorId]);
+    const adsManager = new NativeAdsManager("/83069739/jeff", [AdMobInterstitial.simulatorId]);
 
     return (
       <View style={styles.container}>
@@ -235,7 +236,7 @@ export default class Example extends Component {
             <NativeAdView adsManager={adsManager} ref={el => (this._appNativeExample = el)} />
             <Button
               title="Reload"
-              onPress={() => this._appNativeExample.loadBanner()}
+              onPress={() => this._appNativeExample.reloadAd()}
               style={styles.button}
             />
           </BannerExample>
