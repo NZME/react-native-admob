@@ -6,40 +6,7 @@ import {
 } from 'react-native-admob';
 
 const { width } = Dimensions.get('window');
-/*
 
-    if (unifiedNativeAd.getPrice() == null) {
-      ad.putString("price", null);
-    } else {
-      ad.putString("price", unifiedNativeAd.getPrice());
-    }
-
-    if (unifiedNativeAd.getIcon() == null) {
-      ad.putString("icon", null);
-    } else {
-      WritableMap icon = Arguments.createMap();
-      icon.putString("uri", unifiedNativeAd.getIcon().getUri().toString());
-      icon.putInt("width", unifiedNativeAd.getIcon().getWidth());
-      icon.putInt("height", unifiedNativeAd.getIcon().getHeight());
-      icon.putDouble("scale", unifiedNativeAd.getIcon().getScale());
-      ad.putMap("icon", icon);
-    }
-
-    if (unifiedNativeAd.getImages().size() == 0) {
-      ad.putArray("images", null);
-    } else {
-      WritableArray images = Arguments.createArray();
-      for (NativeAd.Image image: unifiedNativeAd.getImages()) {
-        WritableMap imageMap = Arguments.createMap();
-        imageMap.putString("uri", image.getUri().toString());
-        imageMap.putInt("width", image.getWidth());
-        imageMap.putInt("height", image.getHeight());
-        imageMap.putDouble("scale", image.getScale());
-        images.pushMap(imageMap);
-      }
-      ad.putArray("images", images);
-    }
- */
 export class NativeAdView extends Component {
   constructor(props) {
     super(props);
@@ -52,14 +19,13 @@ export class NativeAdView extends Component {
   };
 
   render() {
-    console.log('NativeAdView', this.props.nativeAd);
     const { nativeAd } = this.state;
     if (nativeAd?.type !== 'native') {
       return null;
     }
     return (
-      <View onPress={this.onPress} style={{ flexDirection: 'column', borderWidth: 1 }}>
-        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}}/>
+      <TriggerableView onPress={this.onPress} style={{ flexDirection: 'column', borderWidth: 1 }}>
+        <View style={{backgroundColor: 'rgba(52, 52, 52, 0.5)'/*, position: 'absolute', top:0, left:0, width: '100%', height: '100%'*/}}>
           <View>
             <Image style={{ width: 80, height: 80 }} />
             <Text>icon.uri: {nativeAd?.icon.uri}</Text>
@@ -97,7 +63,8 @@ export class NativeAdView extends Component {
               </Text>
             </View>
           </View>
-      </View>
+        </View>
+      </TriggerableView>
     );
   }
 }

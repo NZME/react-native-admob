@@ -1,5 +1,5 @@
 import React from 'react';
-import { findNodeHandle, requireNativeComponent } from 'react-native';
+import { findNodeHandle, requireNativeComponent, UIManager } from 'react-native';
 import { TriggerableContext } from './TriggerableViewManager';
 import AdsManager from './NativeAdsManager';
 
@@ -46,12 +46,37 @@ export default (Component) => class NativeAdWrapper extends React.Component {
         return { clickableChildren: newClickableChildren };
       });
     };
-    this.handleAdUpdated = () => this.state.ad &&
+
+    this.handleAdUpdated = () => {
+      this.state.nativeAd &&
       this.props.onAdLoaded &&
-      this.props.onAdLoaded(this.state.ad);
-    this.handleAdLoaded = ({ nativeEvent }) => {
-      this.setState({ ad: nativeEvent }, this.handleAdUpdated);
+      this.props.onAdLoaded(this.state.nativeAd);
+    }
+
+    this.handleOnAdLoaded = ({ nativeEvent }) => {
+      this.setState({ nativeAd: nativeEvent });
     };
+    this.handleOnSizeChange = ({ nativeEvent }) => {
+      const { height, width } = nativeEvent;
+      this.setState({ style: { width, height } });
+      console.log('handleOnSizeChange', nativeEvent);
+    };
+    this.handleOnAdFailedToLoad = ({ nativeEvent }) => {
+      console.log('handleOnAdFailedToLoad', nativeEvent);
+    };
+    this.handleOnAdOpened = ({ nativeEvent }) => {
+      console.log('handleOnAdOpened', nativeEvent);
+    };
+    this.handleOnAdClosed = ({ nativeEvent }) => {
+      console.log('handleOnAdClosed', nativeEvent);
+    };
+    this.handleOnAdLeftApplication = ({ nativeEvent }) => {
+      console.log('handleOnAdLeftApplication', nativeEvent);
+    };
+    this.handleOnAppEvent = ({ nativeEvent }) => {
+      console.log('handleOnAppEvent', nativeEvent);
+    };
+
     this.handleNativeAdViewMount = (ref) => {
       this.nativeAdViewRef = ref;
     };
@@ -63,15 +88,13 @@ export default (Component) => class NativeAdWrapper extends React.Component {
     this.state = {
       // iOS requires a non-null value
       clickableChildren: new Set(),
-      canRequestAds: true
+      style: {},
     };
   }
   /**
    * On init, register for updates on `adsManager` to know when it becomes available
    */
   componentDidMount() {
-    this.subscription = this.props.adsManager.onAdsLoaded(() => this.setState({ canRequestAds: true }));
-    this.subscriptionError = this.props.adsManager.onAdsError(() => this.setState({ canRequestAds: false }));
   }
 
   componentDidUpdate(_, prevState) {
@@ -96,22 +119,34 @@ export default (Component) => class NativeAdWrapper extends React.Component {
    * Clear subscription when component goes off screen
    */
   componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.remove();
-    }
-    if (this.subscriptionError) {
-      this.subscriptionError.remove();
-    }
+  }
+
+  reloadAd() {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.nativeAdViewRef),
+      UIManager.getViewManagerConfig('RNNativeAdsAdView').Commands
+        .reloadAd,
+      null
+    );
+  }
+
+  clickAd() {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.nativeAdViewRef),
+      UIManager.getViewManagerConfig('RNNativeAdsAdView').Commands
+        .clickAd,
+      null
+    );
   }
 
   renderAdComponent(componentProps) {
-    if (!this.state.ad) {
+    if (!this.state.nativeAd) {
       return null;
     }
 
     return (
       <TriggerableContext.Provider value={this.registerFunctionsForTriggerables}>
-        <Component {...componentProps} nativeAd={this.state.ad}/>
+        <Component {...componentProps} nativeAd={this.state.nativeAd}/>
       </TriggerableContext.Provider>
     );
   }
@@ -119,15 +154,20 @@ export default (Component) => class NativeAdWrapper extends React.Component {
   render() {
     // Cast to any until https://github.com/Microsoft/TypeScript/issues/10727 is resolved
     const _a = this.props, { adsManager, onAdLoaded } = _a, rest = __rest(_a, ["adsManager", "onAdLoaded"]);
-    if (!this.state.canRequestAds) {
-      return null;
-    }
 
     return (
       <NativeAdView
+        style={[this.props.style, this.state.style]}
         ref={this.handleNativeAdViewMount}
         adsManager={adsManager.toJSON()}
-        onAdLoaded={this.handleAdLoaded}>
+        onAdLoaded={this.handleOnAdLoaded}
+        onSizeChange={this.handleOnSizeChange}
+        // onAdFailedToLoad={this.handleOnAdFailedToLoad}
+        // onAdOpened={this.handleOnAdOpened}
+        // onAdClosed={this.handleOnAdClosed}
+        // onAdLeftApplication={this.handleOnAdLeftApplication}
+        // onAppEvent={this.handleOnAppEvent}
+        >
         {this.renderAdComponent(rest)}
       </NativeAdView>
     );

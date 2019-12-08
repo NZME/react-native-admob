@@ -334,7 +334,6 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
     }
 
     private void setupLayoutHack() {
-
         Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
             @Override
             public void doFrame(long frameTimeNanos) {

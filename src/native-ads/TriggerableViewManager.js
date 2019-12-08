@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View, TouchableWithoutFeedback } from 'react-native';
 
 export const TriggerableContext = React.createContext({
   register: () => {
@@ -26,7 +26,7 @@ class TriggerableViewChild extends React.Component {
     };
   }
   render() {
-    return <Text {...this.props} ref={this.handleWrapperRef}/>;
+    return <View {...this.props} ref={this.handleWrapperRef}/>;
   }
 }
 export default class TriggerableView extends React.Component {

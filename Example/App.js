@@ -231,7 +231,7 @@ export default class Example extends Component {
             />
           </BannerExample>*/}
           <BannerExample
-            style={{ padding: 20, backgroundColor: '#FF0000' }}
+            style={{ padding: 20}}
             title="DFP - Native ad">
             <NativeAdView adsManager={adsManager} ref={el => (this._appNativeExample = el)} />
             <Button
