@@ -209,8 +209,8 @@ export default class Example extends Component {
             style={{ paddingTop: 5, paddingBottom: 10, paddingRight: 2, paddingLeft: 3, backgroundColor: '#A5A4A8' }}
             title="DFP - Native ad">
             <PublisherNativeAd
-              // adSize="300x600"
-              // validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+              adSize="300x600"
+              validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
               adUnitID="/83069739/jeff"
               adStyles={adStyles}
               onAdFailedToLoad={error => {
@@ -256,15 +256,13 @@ const adStyles = {
     color: '#4C585E',
   },
   ad_app_icon: {
-    paddingLeft: 16,
-    paddingRight: 0,
     width: 111,
     height: 88,
   },
   ad_call_to_action: {
     paddingLeft: 10,
     paddingTop: 10,
-    paddingRight: 4,
+    paddingRight: 10,
     paddingBottom: 10,
     backgroundColor: "#FFFFFF"
   },

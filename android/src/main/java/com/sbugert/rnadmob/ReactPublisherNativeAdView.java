@@ -588,6 +588,8 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
         removeAllViews();
         addView(adView);
+        adView.requestLayout();
+        this.requestLayout();
         fixLayout();
     }
 
