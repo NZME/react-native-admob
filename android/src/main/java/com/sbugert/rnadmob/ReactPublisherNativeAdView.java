@@ -50,7 +50,6 @@ import java.util.ArrayList;
 
 class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;
-    protected WritableMap ad;
     protected UnifiedNativeAdView adView;
     protected PublisherAdView publisherAdView;
     protected ReactApplicationContext applicationContext;
@@ -71,9 +70,14 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         this.createAdView();
     }
 
-    private void processUnifiedNativeAd(UnifiedNativeAd unifiedNativeAd) {
-        ad = Arguments.createMap();
+    private void setNativeAd(UnifiedNativeAd unifiedNativeAd) {
+        if (unifiedNativeAd == null) {
+            sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, null);
+            return;
+        }
 
+        WritableMap ad = Arguments.createMap();
+        ad.putString("type", "native");
         if (unifiedNativeAd.getHeadline() == null) {
             ad.putString("headline", null);
         } else {
@@ -81,21 +85,21 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         if (unifiedNativeAd.getBody() == null) {
-            ad.putString("body", null);
+            ad.putString("bodyText", null);
         } else {
-            ad.putString("body", unifiedNativeAd.getBody());
+            ad.putString("bodyText", unifiedNativeAd.getBody());
         }
 
         if (unifiedNativeAd.getCallToAction() == null) {
-            ad.putString("callToAction", null);
+            ad.putString("callToActionText", null);
         } else {
-            ad.putString("callToAction", unifiedNativeAd.getCallToAction());
+            ad.putString("callToActionText", unifiedNativeAd.getCallToAction());
         }
 
         if (unifiedNativeAd.getAdvertiser() == null) {
-            ad.putString("advertiser", null);
+            ad.putString("advertiserName", null);
         } else {
-            ad.putString("advertiser", unifiedNativeAd.getAdvertiser());
+            ad.putString("advertiserName", unifiedNativeAd.getAdvertiser());
         }
 
         if (unifiedNativeAd.getStarRating() == null) {
@@ -105,9 +109,9 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         if (unifiedNativeAd.getStore() == null) {
-            ad.putString("store", null);
+            ad.putString("storeName", null);
         } else {
-            ad.putString("store", unifiedNativeAd.getStore());
+            ad.putString("storeName", unifiedNativeAd.getStore());
         }
 
         if (unifiedNativeAd.getPrice() == null) {
@@ -141,6 +145,8 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             }
             ad.putArray("images", images);
         }
+
+        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, ad);
     }
 
     private void applyStyle(View view, ReadableMap styles) {
@@ -458,7 +464,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         WritableMap event = Arguments.createMap();
         int width = this.adView.getWidth();
         int height = this.adView.getHeight();
-
+        event.putString("type", "native");
         event.putDouble("width", PixelUtil.toDIPFromPixel(width));
         event.putDouble("height", PixelUtil.toDIPFromPixel(height));
         sendEvent(RNPublisherNativeAdViewManager.EVENT_SIZE_CHANGE, event);
@@ -477,6 +483,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             width = adSize.getWidth();
             height = adSize.getHeight();
         }
+        event.putString("type", "banner");
         event.putDouble("width", width);
         event.putDouble("height", height);
         sendEvent(RNPublisherBannerViewManager.EVENT_SIZE_CHANGE, event);
@@ -549,7 +556,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
                     @Override
                     public void onAdLoaded() {
-                        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, null);
+//                         sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, null);
                     }
 
                     @Override
@@ -591,6 +598,8 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         adView.requestLayout();
         this.requestLayout();
         fixLayout();
+
+        setNativeAd(unifiedNativeAd);
     }
 
     @Override
@@ -608,6 +617,10 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         adView.measure(width, height);
         adView.layout(left, top, left + width, top + height);
         sendOnSizeChangeEvent(adView);
+        WritableMap ad = Arguments.createMap();
+        ad.putString("type", "banner");
+        ad.putString("gadSize", adView.getAdSize().toString());
+        sendEvent(RNPublisherNativeAdViewManager.EVENT_AD_LOADED, ad);
     }
 
     private void sendEvent(String name, @Nullable WritableMap event) {

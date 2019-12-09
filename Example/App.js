@@ -101,7 +101,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          {/*<BannerExample title="AdMob - Basic">
+          <BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="/83069739/jeff"
@@ -204,21 +204,25 @@ export default class Example extends Component {
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>*/}
+          </BannerExample>
           <BannerExample
             style={{ paddingTop: 5, paddingBottom: 10, paddingRight: 2, paddingLeft: 3, backgroundColor: '#A5A4A8' }}
             title="DFP - Native ad">
-            <PublisherNativeAd
-              adSize="300x600"
-              validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
-              adUnitID="/83069739/jeff"
-              adStyles={adStyles}
-              onAdFailedToLoad={error => {
-                console.log(error);
-              }}
-              ref={el => (this._appNativeExample = el)}
-            >
-            </PublisherNativeAd>
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <PublisherNativeAd
+                style={{ width: '100%'}}
+                onSizeChange={(data) => console.log(data)}
+                adSize="300x600"
+                validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+                adUnitID="/83069739/jeff"
+                adStyles={adStyles}
+                onAdFailedToLoad={error => {
+                  console.log(error);
+                }}
+                ref={el => (this._appNativeExample = el)}
+              >
+              </PublisherNativeAd>
+            </View>
             <Button
               title="Reload"
               onPress={() => this._appNativeExample.loadBanner()}
