@@ -12,6 +12,7 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.google.android.gms.ads.AdSize;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
 
     public static final String REACT_CLASS = "RNDFPPublisherNativeAdView";
 
+    public static final String PROP_AD_SIZE = "adSize";
+    public static final String PROP_VALID_AD_SIZES = "validAdSizes";
     public static final String PROP_AD_UNIT_ID = "adUnitID";
     public static final String PROP_AD_STYLES = "adStyles";
     public static final String PROP_TEST_DEVICES = "testDevices";
@@ -76,6 +79,26 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
         return builder.build();
     }
 
+    @ReactProp(name = PROP_AD_SIZE)
+    public void setPropAdSize(final ReactPublisherNativeAdView view, final String sizeString) {
+        AdSize adSize = getAdSizeFromString(sizeString);
+        view.setAdSize(adSize);
+    }
+
+    @ReactProp(name = PROP_VALID_AD_SIZES)
+    public void setPropValidAdSizes(final ReactPublisherNativeAdView view, final ReadableArray adSizeStrings) {
+        ReadableNativeArray nativeArray = (ReadableNativeArray)adSizeStrings;
+        ArrayList<Object> list = nativeArray.toArrayList();
+        String[] adSizeStringsArray = list.toArray(new String[list.size()]);
+        AdSize[] adSizes = new AdSize[list.size()];
+
+        for (int i = 0; i < adSizeStringsArray.length; i++) {
+            String adSizeString = adSizeStringsArray[i];
+            adSizes[i] = getAdSizeFromString(adSizeString);
+        }
+        view.setValidAdSizes(adSizes);
+    }
+
     @ReactProp(name = PROP_AD_UNIT_ID)
     public void setPropAdUnitID(final ReactPublisherNativeAdView view, final String adUnitID) {
         view.setAdUnitID(adUnitID);
@@ -105,6 +128,31 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
             case COMMAND_LOAD_BANNER:
                 root.loadBanner();
                 break;
+        }
+    }
+
+    private AdSize getAdSizeFromString(String adSize) {
+        switch (adSize) {
+            case "banner":
+                return AdSize.BANNER;
+            case "largeBanner":
+                return AdSize.LARGE_BANNER;
+            case "mediumRectangle":
+                return AdSize.MEDIUM_RECTANGLE;
+            case "fullBanner":
+                return AdSize.FULL_BANNER;
+            case "leaderBoard":
+                return AdSize.LEADERBOARD;
+            case "smartBannerPortrait":
+                return AdSize.SMART_BANNER;
+            case "smartBannerLandscape":
+                return AdSize.SMART_BANNER;
+            case "smartBanner":
+                return AdSize.SMART_BANNER;
+            case "300x600":
+                return new AdSize(300, 600);
+            default:
+                return AdSize.BANNER;
         }
     }
 }

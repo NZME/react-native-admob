@@ -1,16 +1,22 @@
 package com.sbugert.rnadmob;
 
-import android.app.Activity;
+import java.util.Arrays;
+import java.util.List;
+import java.io.IOException;
+
 import android.content.Context;
+
 import androidx.annotation.Nullable;
+
+import android.util.Log;
 import android.view.View;
 import android.graphics.Color;
 import android.view.Choreographer;
 import android.view.LayoutInflater;
 import android.widget.TextView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.graphics.Typeface;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
@@ -27,25 +33,33 @@ import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
+import com.google.android.gms.ads.formats.OnPublisherAdViewLoadedListener;
 import com.google.android.gms.ads.formats.MediaView;
 import com.google.android.gms.ads.VideoController;
 import com.google.android.gms.ads.VideoOptions;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 
+import java.util.ArrayList;
 
-class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener {
+
+class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;
     protected WritableMap ad;
     protected UnifiedNativeAdView adView;
+    protected PublisherAdView publisherAdView;
     protected ReactApplicationContext applicationContext;
 
     String[] testDevices;
     ReadableMap adStyles;
     String adUnitID;
+    AdSize[] validAdSizes;
+    AdSize adSize;
 
     public ReactPublisherNativeAdView(final ThemedReactContext context, ReactApplicationContext applicationContext) {
         super(context);
@@ -117,7 +131,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             ad.putArray("images", null);
         } else {
             WritableArray images = Arguments.createArray();
-            for (NativeAd.Image image: unifiedNativeAd.getImages()) {
+            for (NativeAd.Image image : unifiedNativeAd.getImages()) {
                 WritableMap imageMap = Arguments.createMap();
                 imageMap.putString("uri", image.getUri().toString());
                 imageMap.putInt("width", image.getWidth());
@@ -134,17 +148,70 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             int backgroundColor = Color.parseColor(styles.getString("backgroundColor"));
             view.setBackgroundColor(backgroundColor);
         }
-        if (styles.hasKey("padding")) {
-            Float padding = PixelUtil.toPixelFromDIP(styles.getInt("padding"));
-            view.setPadding(padding.intValue(), padding.intValue(), padding.intValue(), padding.intValue());
+        if (styles.hasKey("visibility") && styles.getString("visibility") != null && styles.getString("visibility").equals("hidden")) {
+            view.setVisibility(View.INVISIBLE);
         }
+        WritableMap padding = Arguments.createMap();
+        padding.putInt("top", 0);
+        padding.putInt("right", 0);
+        padding.putInt("bottom", 0);
+        padding.putInt("left", 0);
+        if (styles.hasKey("padding")) {
+            int paddingAll = Math.round(PixelUtil.toPixelFromDIP(styles.getInt("padding")));
+            padding.putInt("top", paddingAll);
+            padding.putInt("right", paddingAll);
+            padding.putInt("bottom", paddingAll);
+            padding.putInt("left", paddingAll);
+        }
+        if (styles.hasKey("paddingTop")) {
+            padding.putInt("top", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("paddingTop"))));
+        }
+        if (styles.hasKey("paddingRight")) {
+            padding.putInt("right", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("paddingRight"))));
+        }
+        if (styles.hasKey("paddingBottom")) {
+            padding.putInt("bottom", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("paddingBottom"))));
+        }
+        if (styles.hasKey("paddingLeft")) {
+            padding.putInt("left", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("paddingLeft"))));
+        }
+        WritableMap margin = Arguments.createMap();
+        margin.putInt("top", 0);
+        margin.putInt("right", 0);
+        margin.putInt("bottom", 0);
+        margin.putInt("left", 0);
+        if (styles.hasKey("margin")) {
+            int marginAll = Math.round(PixelUtil.toPixelFromDIP(styles.getInt("margin")));
+            margin.putInt("top", marginAll);
+            margin.putInt("right", marginAll);
+            margin.putInt("bottom", marginAll);
+            margin.putInt("left", marginAll);
+        }
+        if (styles.hasKey("marginTop")) {
+            margin.putInt("top", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("marginTop"))));
+        }
+        if (styles.hasKey("marginRight")) {
+            margin.putInt("right", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("marginRight"))));
+        }
+        if (styles.hasKey("marginBottom")) {
+            margin.putInt("bottom", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("marginBottom"))));
+        }
+        if (styles.hasKey("marginLeft")) {
+            margin.putInt("left", Math.round(PixelUtil.toPixelFromDIP(styles.getInt("marginLeft"))));
+        }
+
+        padding.putInt("top", padding.getInt("top") + margin.getInt("top"));
+        padding.putInt("right", padding.getInt("right") + margin.getInt("right"));
+        padding.putInt("bottom", padding.getInt("bottom") + margin.getInt("bottom"));
+        padding.putInt("left", padding.getInt("left") + margin.getInt("left"));
+
+        view.setPadding(padding.getInt("left"), padding.getInt("top"), padding.getInt("right"), padding.getInt("bottom"));
+
         if (styles.hasKey("width")) {
-            Float width = PixelUtil.toPixelFromDIP(styles.getInt("width"));
-            view.getLayoutParams().width = width.intValue();
+            view.getLayoutParams().width = Math.round(PixelUtil.toPixelFromDIP(styles.getInt("width")));
         }
         if (styles.hasKey("height")) {
-            Float height = PixelUtil.toPixelFromDIP(styles.getInt("height"));
-            view.getLayoutParams().height = height.intValue();
+            view.getLayoutParams().height = Math.round(PixelUtil.toPixelFromDIP(styles.getInt("height")));
         }
         if (view instanceof TextView) {
             if (styles.hasKey("color") && styles.getString("color") != null) {
@@ -154,6 +221,32 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             if (styles.hasKey("fontSize")) {
                 int fontSize = styles.getInt("fontSize");
                 ((TextView) view).setTextSize(fontSize);
+            }
+            if (styles.hasKey("lineHeight")) {
+                int fontSize = styles.getInt("lineHeight");
+                ((TextView) view).setTextSize(fontSize);
+            }
+            if (styles.hasKey("fontFamily")) {
+                String fontFamily = styles.getString("fontFamily");
+                try {
+                    List<String> mapList = Arrays.asList(applicationContext.getAssets().list("fonts/"));
+                    if (mapList.contains(fontFamily + ".ttf")) {
+                        Typeface font = Typeface.createFromAsset(applicationContext.getAssets(), "fonts/" + fontFamily + ".ttf");
+                        ((TextView) view).setTypeface(font);
+                    } else if (mapList.contains(fontFamily + ".otf")) {
+                        Typeface font = Typeface.createFromAsset(applicationContext.getAssets(), "fonts/" + fontFamily + ".otf");
+                        ((TextView) view).setTypeface(font);
+                    }
+                } catch (IOException ex) {
+                }
+            }
+            if (styles.hasKey("textTransform") && styles.getString("textTransform") != null) {
+                String textTransform = styles.getString("textTransform");
+                if (textTransform.equals("uppercase")) {
+                    ((TextView) view).setText(((TextView) view).getText().toString().toUpperCase());
+                } else if (textTransform.equals("lowercase")) {
+                    ((TextView) view).setText(((TextView) view).getText().toString().toLowerCase());
+                }
             }
         }
     }
@@ -182,11 +275,19 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
             }
         }
 
+        TextView adSponsored = (TextView) nativeAdView.findViewById(R.id.ad_sponsored);
+        if (adSponsored != null) {
+            if (this.adStyles.hasKey("ad_sponsored")) {
+                applyStyle(adSponsored, this.adStyles.getMap("ad_sponsored"));
+            }
+            ((TextView) adSponsored).setText("Sponsored");
+        }
+
         // Set other ad assets.
         // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to
         // check before trying to display them.
         TextView adBodyView = (TextView) nativeAdView.findViewById(R.id.ad_body);
-        if (adBodyView != null ) {
+        if (adBodyView != null) {
             if (this.adStyles.hasKey("ad_body")) {
                 applyStyle(adBodyView, this.adStyles.getMap("ad_body"));
             }
@@ -218,7 +319,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         ImageView adAppIconView = (ImageView) nativeAdView.findViewById(R.id.ad_app_icon);
-        if (adAppIconView != null ) {
+        if (adAppIconView != null) {
             if (this.adStyles.hasKey("ad_app_icon")) {
                 applyStyle(adAppIconView, this.adStyles.getMap("ad_app_icon"));
             }
@@ -233,7 +334,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         TextView adPriceView = (TextView) nativeAdView.findViewById(R.id.ad_price);
-        if (adPriceView != null ) {
+        if (adPriceView != null) {
             if (this.adStyles.hasKey("ad_price")) {
                 applyStyle(adPriceView, this.adStyles.getMap("ad_price"));
             }
@@ -247,7 +348,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         RatingBar adStarsView = (RatingBar) nativeAdView.findViewById(R.id.ad_stars);
-        if (adStarsView != null ) {
+        if (adStarsView != null) {
             if (this.adStyles.hasKey("ad_stars")) {
                 applyStyle(adStarsView, this.adStyles.getMap("ad_stars"));
             }
@@ -262,7 +363,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         TextView adStoreView = (TextView) nativeAdView.findViewById(R.id.ad_store);
-        if (adStoreView != null ) {
+        if (adStoreView != null) {
             if (this.adStyles.hasKey("ad_store")) {
                 applyStyle(adStoreView, this.adStyles.getMap("ad_store"));
             }
@@ -276,7 +377,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         }
 
         TextView adAdvertiserView = (TextView) nativeAdView.findViewById(R.id.ad_advertiser);
-        if (adAdvertiserView != null ) {
+        if (adAdvertiserView != null) {
             if (this.adStyles.hasKey("ad_advertiser")) {
                 applyStyle(adAdvertiserView, this.adStyles.getMap("ad_advertiser"));
             }
@@ -334,7 +435,6 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
     }
 
     private void setupLayoutHack() {
-
         Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
             @Override
             public void doFrame(long frameTimeNanos) {
@@ -364,8 +464,26 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         sendEvent(RNPublisherNativeAdViewManager.EVENT_SIZE_CHANGE, event);
     }
 
+    private void sendOnSizeChangeEvent(PublisherAdView adView) {
+        int width;
+        int height;
+        ReactContext reactContext = (ReactContext) getContext();
+        WritableMap event = Arguments.createMap();
+        AdSize adSize = adView.getAdSize();
+        if (adSize == AdSize.SMART_BANNER) {
+            width = (int) PixelUtil.toDIPFromPixel(adSize.getWidthInPixels(reactContext));
+            height = (int) PixelUtil.toDIPFromPixel(adSize.getHeightInPixels(reactContext));
+        } else {
+            width = adSize.getWidth();
+            height = adSize.getHeight();
+        }
+        event.putDouble("width", width);
+        event.putDouble("height", height);
+        sendEvent(RNPublisherBannerViewManager.EVENT_SIZE_CHANGE, event);
+    }
+
     private void createAdView() {
-        final Context context = getContext();
+        final ReactContext reactContext = (ReactContext) getContext();
         final ReactPublisherNativeAdView parent = this;
 
         VideoOptions videoOptions = new VideoOptions.Builder()
@@ -376,22 +494,34 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
                 .setVideoOptions(videoOptions)
                 .build();
 
-        this.adLoader = new AdLoader.Builder(context, this.adUnitID)
-                .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-                    @Override
-                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-                        if (adView != null) adView.destroy();
+        ArrayList<AdSize> adSizes = new ArrayList<AdSize>();
+        if (this.adSize != null) {
+            adSizes.add(this.adSize);
+        }
+        if (this.validAdSizes != null) {
+            for (int i = 0; i < this.validAdSizes.length; i++) {
+                adSizes.add(this.validAdSizes[i]);
+            }
+        }
 
-                        LayoutInflater inflater = LayoutInflater.from(context);
-                        adView = (UnifiedNativeAdView) inflater.inflate(R.layout.ad_small, parent, false);
+        if (adSizes.size() == 0) {
+            adSizes.add(AdSize.BANNER);
+        }
 
-                        populateUnifiedNativeAdView(unifiedNativeAd, adView);
+        AdSize[] adSizesArray = adSizes.toArray(new AdSize[adSizes.size()]);
 
-                        removeAllViews();
-                        addView(adView);
-                        fixLayout();
-                    }
-                })
+        /*
+        AdSize.BANNER, AdSize.FULL_BANNER,
+                        AdSize.LARGE_BANNER,
+                        AdSize.LEADERBOARD,
+                        AdSize.MEDIUM_RECTANGLE,
+                        AdSize.WIDE_SKYSCRAPER,
+                        AdSize.SMART_BANNER,
+                        AdSize.FLUID
+         */
+        this.adLoader = new AdLoader.Builder(reactContext, this.adUnitID)
+                .forUnifiedNativeAd(ReactPublisherNativeAdView.this)
+                .forPublisherAdView(ReactPublisherNativeAdView.this, adSizesArray)
                 .withAdListener(new AdListener() {
                     @Override
                     public void onAdFailedToLoad(int errorCode) {
@@ -446,6 +576,38 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
                 .build();
     }
 
+    @Override
+    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+        if (adView != null) adView.destroy();
+        final ReactContext reactContext = (ReactContext) getContext();
+
+        LayoutInflater inflater = LayoutInflater.from(reactContext);
+        adView = (UnifiedNativeAdView) inflater.inflate(R.layout.ad_small, this, false);
+
+        populateUnifiedNativeAdView(unifiedNativeAd, adView);
+
+        removeAllViews();
+        addView(adView);
+        fixLayout();
+    }
+
+    @Override
+    public void onPublisherAdViewLoaded(PublisherAdView adView) {
+        if (publisherAdView != null) publisherAdView.destroy();
+
+        final Context context = getContext();
+        publisherAdView = adView;
+        removeAllViews();
+        this.addView(adView);
+        int width = adView.getAdSize().getWidthInPixels(context);
+        int height = adView.getAdSize().getHeightInPixels(context);
+        int left = adView.getLeft();
+        int top = adView.getTop();
+        adView.measure(width, height);
+        adView.layout(left, top, left + width, top + height);
+        sendOnSizeChangeEvent(adView);
+    }
+
     private void sendEvent(String name, @Nullable WritableMap event) {
         ReactContext reactContext = (ReactContext) getContext();
         reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
@@ -486,6 +648,14 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
         this.testDevices = testDevices;
     }
 
+    public void setAdSize(AdSize adSize) {
+        this.adSize = adSize;
+    }
+
+    public void setValidAdSizes(AdSize[] adSizes) {
+        this.validAdSizes = adSizes;
+    }
+
     @Override
     public void onAppEvent(String name, String info) {
         WritableMap event = Arguments.createMap();
@@ -506,6 +676,9 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
     public void onHostDestroy() {
         if (this.adView != null) {
             this.adView.destroy();
+        }
+        if (this.publisherAdView != null) {
+            this.publisherAdView.destroy();
         }
     }
 }
