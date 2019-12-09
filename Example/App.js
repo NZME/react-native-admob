@@ -233,16 +233,18 @@ export default class Example extends Component {
 
 const adStyles = {
   ad_sponsored: {
-    fontSize: 12,
-    lineHeight: 14,
-    paddingBottom: 3,
+    fontSize: 10,
+    lineHeight: 12,
+    padding: 5,
     fontFamily: 'Stag-Medium',
     textTransform: 'uppercase',
     color: '#2F74BA',
+    backgroundColor: '#ECEDE9',
   },
   ad_headline: {
     fontSize: 19,
     lineHeight: 22,
+    paddingTop: 3,
     paddingBottom: 3,
     fontFamily: 'Stag-Medium',
     color: '#4C585E',

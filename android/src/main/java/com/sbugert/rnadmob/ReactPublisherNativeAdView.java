@@ -277,10 +277,10 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
         TextView adSponsored = (TextView) nativeAdView.findViewById(R.id.ad_sponsored);
         if (adSponsored != null) {
+            ((TextView) adSponsored).setText("Sponsored");
             if (this.adStyles.hasKey("ad_sponsored")) {
                 applyStyle(adSponsored, this.adStyles.getMap("ad_sponsored"));
             }
-            ((TextView) adSponsored).setText("Sponsored");
         }
 
         // Set other ad assets.
