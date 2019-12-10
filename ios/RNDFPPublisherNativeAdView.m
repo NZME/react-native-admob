@@ -108,6 +108,7 @@
                                 300);
     if (self.onSizeChange) {
         self.onSizeChange(@{
+                            @"type": @"native",
                             @"width": @(self.frame.size.width),
                             @"height": @(self.frame.size.height) });
     }
@@ -117,10 +118,82 @@
     if (styles[@"backgroundColor"]) {
         view.backgroundColor = [RCTConvert UIColor:styles[@"backgroundColor"]];
     }
-    if (styles[@"padding"]) {
-        CGFloat padding = [RCTConvert CGFloat:styles[@"padding"]];
-        view.bounds = CGRectInset(view.frame, padding, padding);
+    if (styles[@"visibility"]) {
+        NSString *visibility = [RCTConvert NSString:styles[@"visibility"]];
+        if ([visibility  isEqual: @"hidden"]) {
+            view.hidden =  YES;
+        }
     }
+
+    NSMutableDictionary *padding = [[NSMutableDictionary alloc] init];
+    padding[@"top"] = @((CGFloat)0);
+    padding[@"right"] = @((CGFloat)0);
+    padding[@"bottom"] = @((CGFloat)0);
+    padding[@"left"] = @((CGFloat)0);
+    if (styles[@"padding"]) {
+        NSNumber *paddingAll = [RCTConvert NSNumber:styles[@"padding"]];
+        padding[@"top"] = @((CGFloat)[paddingAll floatValue]);
+        padding[@"right"] = @((CGFloat)[paddingAll floatValue]);
+        padding[@"bottom"] = @((CGFloat)[paddingAll floatValue]);
+        padding[@"left"] = @((CGFloat)[paddingAll floatValue]);
+    }
+    if (styles[@"paddingTop"]) {
+        NSNumber* paddingTop = [RCTConvert NSNumber:styles[@"paddingTop"]];
+        padding[@"top"] = @((CGFloat)[paddingTop floatValue]);
+    }
+    if (styles[@"paddingRight"]) {
+        NSNumber* paddingRight = [RCTConvert NSNumber:styles[@"paddingRight"]];
+        padding[@"right"] = @((CGFloat)[paddingRight floatValue]);
+    }
+    if (styles[@"paddingBottom"]) {
+        NSNumber* paddingBottom = [RCTConvert NSNumber:styles[@"paddingBottom"]];
+        padding[@"bottom"] = @((CGFloat)[paddingBottom floatValue]);
+    }
+    if (styles[@"paddingLeft"]) {
+        NSNumber* paddingLeft = [RCTConvert NSNumber:styles[@"paddingLeft"]];
+        padding[@"left"] = @((CGFloat)[paddingLeft floatValue]);
+    }
+    CGFloat top = [RCTConvert CGFloat:padding[@"top"]];
+    CGFloat left = [RCTConvert CGFloat:padding[@"left"]];
+    CGFloat bottom = [RCTConvert CGFloat:padding[@"bottom"]];
+    CGFloat right = [RCTConvert CGFloat:padding[@"right"]];
+//    view.layoutMargins = UIEdgeInsetsMake(top, left, bottom, right);
+//    view.bounds = CGRectInset(view.frame, top, right);
+    
+    NSMutableDictionary *margin = [[NSMutableDictionary alloc] init];
+    margin[@"top"] = @((CGFloat)0);
+    margin[@"right"] = @((CGFloat)0);
+    margin[@"bottom"] = @((CGFloat)0);
+    margin[@"left"] = @((CGFloat)0);
+    if (styles[@"margin"]) {
+        NSNumber* marginAll = [RCTConvert NSNumber:styles[@"margin"]];
+        margin[@"top"] = @((CGFloat)[marginAll floatValue]);
+        margin[@"right"] = @((CGFloat)[marginAll floatValue]);
+        margin[@"bottom"] = @((CGFloat)[marginAll floatValue]);
+        margin[@"left"] = @((CGFloat)[marginAll floatValue]);
+    }
+    if (styles[@"marginTop"]) {
+        NSNumber* marginTop = [RCTConvert NSNumber:styles[@"marginTop"]];
+        margin[@"top"] = @((CGFloat)[marginTop floatValue]);
+    }
+    if (styles[@"marginRight"]) {
+        NSNumber* marginRight = [RCTConvert NSNumber:styles[@"marginRight"]];
+        margin[@"right"] = @((CGFloat)[marginRight floatValue]);
+    }
+    if (styles[@"marginBottom"]) {
+        NSNumber* marginBottom = [RCTConvert NSNumber:styles[@"marginBottom"]];
+        margin[@"bottom"] = @((CGFloat)[marginBottom floatValue]);
+    }
+    if (styles[@"margingLeft"]) {
+        NSNumber* margingLeft = [RCTConvert NSNumber:styles[@"margingLeft"]];
+        margin[@"left"] = @((CGFloat)[margingLeft floatValue]);
+    }
+    CGFloat mtop = top + [RCTConvert CGFloat:margin[@"top"]];
+    CGFloat mleft = left + [RCTConvert CGFloat:margin[@"left"]];
+    CGFloat mbottom = bottom + [RCTConvert CGFloat:margin[@"bottom"]];
+    CGFloat mright = right + [RCTConvert CGFloat:margin[@"right"]];
+    view.layoutMargins = UIEdgeInsetsMake(mtop, mleft, mbottom, mright);
+
     if (styles[@"width"]) {
         NSNumber* width = [RCTConvert NSNumber:styles[@"width"]];
         view.frame = CGRectMake(view.frame.origin.x,
@@ -143,6 +216,9 @@
         if (styles[@"fontSize"]) {
             [(UILabel *)view setFont: [((UILabel *)view).font fontWithSize:[RCTConvert NSInteger:styles[@"fontSize"]]]];
         }
+//        if (styles[@"lineHeight"]) {
+//            [(UILabel *)view setFont: [((UILabel *)view).font lineHeight:[RCTConvert NSInteger:styles[@"lineHeight"]]];
+//        }
         if (styles[@"fontFamily"]) {
             UIFont* currentFont = ((UILabel *)view).font;
             [(UILabel *)view setFont: [UIFont
@@ -183,6 +259,19 @@
         ((UILabel *)nativeAdView.headlineView).text = nativeAd.headline;
         if (_adStyles[@"ad_headline"]) {
             [self applyStyles:nativeAdView.headlineView styles:(NSDictionary *)_adStyles[@"ad_headline"]];
+        }
+    }
+    
+    if (nativeAdView.advertiserView) {
+        ((UILabel *)nativeAdView.advertiserView).text = @"Sponsored";
+        if (_adStyles[@"ad_sponsored"]) {
+            [self applyStyles:nativeAdView.headlineView styles:(NSDictionary *)_adStyles[@"ad_headline"]];
+        }
+    }
+    if (nativeAdView.advertiserView) {
+        ((UILabel *)nativeAdView.advertiserView).text = @"Sponsored";
+        if (_adStyles[@"ad_sponsored"]) {
+            [self applyStyles:nativeAdView.advertiserView styles:(NSDictionary *)_adStyles[@"ad_sponsored"]];
         }
     }
 
@@ -259,13 +348,13 @@
         }
     }
 
-    if (nativeAdView.advertiserView) {
-        ((UILabel *)nativeAdView.advertiserView).text = nativeAd.advertiser;
-        nativeAdView.advertiserView.hidden = nativeAd.advertiser ? NO : YES;
-        if (_adStyles[@"ad_advertiser"]) {
-            [self applyStyles:nativeAdView.advertiserView styles:(NSDictionary *)_adStyles[@"ad_advertiser"]];
-        }
-    }
+//    if (nativeAdView.advertiserView) {
+//        ((UILabel *)nativeAdView.advertiserView).text = nativeAd.advertiser;
+//        nativeAdView.advertiserView.hidden = nativeAd.advertiser ? NO : YES;
+//        if (_adStyles[@"ad_advertiser"]) {
+//            [self applyStyles:nativeAdView.advertiserView styles:(NSDictionary *)_adStyles[@"ad_advertiser"]];
+//        }
+//    }
 
     // Remove previous ad view.
     [self.nativeAdView removeFromSuperview];
@@ -297,6 +386,7 @@
     
     if (self.onSizeChange) {
         self.onSizeChange(@{
+                            @"type": @"native",
                             @"width": @(self.frame.size.width),
                             @"height": @(self.frame.size.height) });
     }

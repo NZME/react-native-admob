@@ -23,6 +23,8 @@
         return kGADAdSizeSmartBannerPortrait;
     } else if ([adSize isEqualToString:@"smartBannerLandscape"]) {
         return kGADAdSizeSmartBannerLandscape;
+    } else if ([adSize isEqualToString:@"300x600"]) {
+        return GADAdSizeFromCGSize(CGSizeMake(300, 600));
     }
     else {
         return kGADAdSizeInvalid;
