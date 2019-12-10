@@ -103,7 +103,7 @@
     NSLog(@"self.bounds.size.height: %f", self.bounds.size.height);
     NSLog(@"self.intrinsicContentSize.width: %f", self.intrinsicContentSize.width);
     NSLog(@"self.intrinsicContentSize.height: %f", self.intrinsicContentSize.height);
-    
+
     self.frame = CGRectMake(self.frame.origin.x,
                                 self.frame.origin.y,
                                 self.frame.size.width,
@@ -159,8 +159,8 @@
     CGFloat left = [RCTConvert CGFloat:padding[@"left"]];
     CGFloat bottom = [RCTConvert CGFloat:padding[@"bottom"]];
     CGFloat right = [RCTConvert CGFloat:padding[@"right"]];
-//    view.layoutMargins = UIEdgeInsetsMake(top, left, bottom, right);
-//    view.bounds = CGRectInset(view.frame, top, right);
+//    view.bounds = UIEdgeInsetsInsetRect(view.frame, UIEdgeInsetsMake(top, left, bottom, right));
+    view.bounds = CGRectInset(view.frame, -top, -right);
     
     NSMutableDictionary *margin = [[NSMutableDictionary alloc] init];
     margin[@"top"] = @((CGFloat)0);
@@ -190,10 +190,10 @@
         NSNumber* margingLeft = [RCTConvert NSNumber:styles[@"margingLeft"]];
         margin[@"left"] = @((CGFloat)[margingLeft floatValue]);
     }
-    CGFloat mtop = top + [RCTConvert CGFloat:margin[@"top"]];
-    CGFloat mleft = left + [RCTConvert CGFloat:margin[@"left"]];
-    CGFloat mbottom = bottom + [RCTConvert CGFloat:margin[@"bottom"]];
-    CGFloat mright = right + [RCTConvert CGFloat:margin[@"right"]];
+    CGFloat mtop = [RCTConvert CGFloat:margin[@"top"]];
+    CGFloat mleft = [RCTConvert CGFloat:margin[@"left"]];
+    CGFloat mbottom = [RCTConvert CGFloat:margin[@"bottom"]];
+    CGFloat mright = [RCTConvert CGFloat:margin[@"right"]];
     view.layoutMargins = UIEdgeInsetsMake(mtop, mleft, mbottom, mright);
 
     if (styles[@"width"]) {
@@ -229,11 +229,9 @@
         }
         if (styles[@"textTransform"]) {
             NSString* text = ((UILabel *)view).text;
-            NSLog(@"text: %@", text);
             NSString *key = [RCTConvert NSString:styles[@"textTransform"]];
             ((void (^)(void))@{
                 @"uppercase" : ^{
-                    NSLog(@"text: %@", text);
                     [(UILabel *)view setText:[text uppercaseString]];
                 },
                 @"lowercase" : ^{
@@ -363,28 +361,36 @@
     self.nativeAdView = nativeAdView;
 
     [self addSubview:nativeAdView];
-
-    CGFloat subViewHeight = 0;
-    for (UIView *subview in nativeAdView.subviews)
-    {
-        if ([subview isKindOfClass:[UILabel class]]) {
-            subViewHeight = subViewHeight + subview.frame.size.height;
-        }
-    }
-    NSLog(@"all subview height: %f", subViewHeight);
+    NSLog(@"all subview width: %f", nativeAdView.frame.size.width);
+    NSLog(@"all subview height: %f", nativeAdView.frame.size.height);
+    NSLog(@"all subview x: %f", nativeAdView.frame.origin.x);
+    NSLog(@"all subview y: %f", nativeAdView.frame.origin.y);
+//
+//    CGFloat subViewHeight = 0;
+//    for (UIView *subview in nativeAdView.subviews)
+//    {
+//        if ([subview isKindOfClass:[UILabel class]]) {
+//            subViewHeight = subViewHeight + subview.frame.size.height;
+//        }
+//    }
+//    NSLog(@"all subview height: %f", subViewHeight);
+//
+//    if (subViewHeight < 200) {
+//        subViewHeight = 200;
+//    }
+//
+//    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+//
     
-    if (subViewHeight < 200) {
-        subViewHeight = 200;
-    }
-
-    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-
     self.frame = CGRectMake(self.frame.origin.x,
         self.frame.origin.y,
         self.frame.size.width,
-        subViewHeight);
+        nativeAdView.frame.size.height);
+
+    [self sizeToFit];
+    [nativeAdView sizeToFit];
     
     if (self.onSizeChange) {
         self.onSizeChange(@{
