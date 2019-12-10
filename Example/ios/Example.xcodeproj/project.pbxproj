@@ -395,8 +395,8 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-resources.sh",
-				"${PODS_ROOT}/../../../ios/UnifiedNativeAdView.xib",
-				"${PODS_ROOT}/../../../ios/UnifiedNativeAdViewSmall.xib",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/UnifiedNativeAdView.xib",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/UnifiedNativeAdViewSmall.xib",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (

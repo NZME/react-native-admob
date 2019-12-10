@@ -12,6 +12,8 @@
 #import "RCTLog.h"
 #endif
 
+#include "RCTConvert+GADAdSize.h"
+
 @implementation RNDFPPublisherNativeAdView
 
 - (void)dealloc
@@ -415,6 +417,25 @@
 - (void)setAdUnitID:(NSString *)adUnitID
 {
     _adUnitID = adUnitID;
+}
+
+- (void)setadSize:(NSString *)adSize
+{
+    _adSize = adSize;
+}
+
+- (void)setValidAdSizes:(NSArray *)adSizes
+{
+    __block NSMutableArray *validAdSizes = [[NSMutableArray alloc] initWithCapacity:adSizes.count];
+    [adSizes enumerateObjectsUsingBlock:^(id jsonValue, NSUInteger idx, __unused BOOL *stop) {
+        GADAdSize adSize = [RCTConvert GADAdSize:jsonValue];
+        if (GADAdSizeEqualToSize(adSize, kGADAdSizeInvalid)) {
+            RCTLogWarn(@"Invalid adSize %@", jsonValue);
+        } else {
+            [validAdSizes addObject:NSValueFromGADAdSize(adSize)];
+        }
+    }];
+    _validAdSizes = validAdSizes;
 }
 
 #pragma mark GADAdLoaderDelegate implementation

@@ -19,6 +19,7 @@
 /// The native ad view that is being presented.
 @property(nonatomic, strong) UIView *nativeAdView;
 
+@property (nonatomic, copy) NSString *adSize;
 @property (nonatomic, copy) NSArray *validAdSizes;
 @property (nonatomic, copy) NSDictionary *adStyles;
 @property (nonatomic, copy) NSArray *testDevices;
