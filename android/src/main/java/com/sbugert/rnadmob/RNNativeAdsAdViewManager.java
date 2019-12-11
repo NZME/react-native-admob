@@ -9,15 +9,20 @@ import android.view.View;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.google.android.gms.ads.AdSize;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView> {
     public static final String PROP_AD_MANAGER = "adsManager";
+    public static final String PROP_AD_SIZE = "adSize";
+    public static final String PROP_VALID_AD_SIZES = "validAdSizes";
     public static final String EVENT_AD_LOADED = "onAdLoaded";
     public static final String EVENT_SIZE_CHANGE = "onSizeChange";
     public static final String EVENT_AD_FAILED_TO_LOAD = "onAdFailedToLoad";
@@ -80,9 +85,29 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
         return builder.build();
     }
 
+    @ReactProp(name = PROP_AD_SIZE)
+    public void setPropAdSize(final RNNativeAdsAdView view, final String sizeString) {
+        AdSize adSize = getAdSizeFromString(sizeString);
+        view.setAdSize(adSize);
+    }
+
+    @ReactProp(name = PROP_VALID_AD_SIZES)
+    public void setPropValidAdSizes(final RNNativeAdsAdView view, final ReadableArray adSizeStrings) {
+        ReadableNativeArray nativeArray = (ReadableNativeArray)adSizeStrings;
+        ArrayList<Object> list = nativeArray.toArrayList();
+        String[] adSizeStringsArray = list.toArray(new String[list.size()]);
+        AdSize[] adSizes = new AdSize[list.size()];
+
+        for (int i = 0; i < adSizeStringsArray.length; i++) {
+            String adSizeString = adSizeStringsArray[i];
+            adSizes[i] = getAdSizeFromString(adSizeString);
+        }
+        view.setValidAdSizes(adSizes);
+    }
+
     @Override
     public void addView(RNNativeAdsAdView parent, View child, int index) {
-//        parent.addView(child, index);
+        parent.addView(child, index);
     }
 
     @Override
@@ -118,6 +143,31 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
             case COMMAND_CLICK_AD:
                 root.clickAd();
                 break;
+        }
+    }
+
+    private AdSize getAdSizeFromString(String adSize) {
+        switch (adSize) {
+            case "banner":
+                return AdSize.BANNER;
+            case "largeBanner":
+                return AdSize.LARGE_BANNER;
+            case "mediumRectangle":
+                return AdSize.MEDIUM_RECTANGLE;
+            case "fullBanner":
+                return AdSize.FULL_BANNER;
+            case "leaderBoard":
+                return AdSize.LEADERBOARD;
+            case "smartBannerPortrait":
+                return AdSize.SMART_BANNER;
+            case "smartBannerLandscape":
+                return AdSize.SMART_BANNER;
+            case "smartBanner":
+                return AdSize.SMART_BANNER;
+            case "300x600":
+                return new AdSize(300, 600);
+            default:
+                return AdSize.BANNER;
         }
     }
 }

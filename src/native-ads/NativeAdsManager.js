@@ -2,17 +2,6 @@ import { NativeModules, NativeEventEmitter } from 'react-native';
 
 const RNNativeAdsManager = NativeModules.RNNativeAdsManager;
 
-/*
-TODO:
-done RNNativeAdsManager
-done init
-done registerViewsForInteraction
-
-done - RNNativeAdsAdView
-public static final String EVENT_AD_LOADED = "onAdLoaded";
-public static final String EVENT_AD_FAILED_TO_LOAD = "onAdFailed";
- */
-
 export default class NativeAdsManager {
   constructor(adUnitID, testDevices) {
     // Indicates whether AdsManager is ready to serve ads

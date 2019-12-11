@@ -26,7 +26,7 @@ class TriggerableViewChild extends React.Component {
     };
   }
   render() {
-    return <View {...this.props} ref={this.handleWrapperRef}/>;
+    return <Text {...this.props} ref={this.handleWrapperRef}/>;
   }
 }
 export default class TriggerableView extends React.Component {

@@ -20,51 +20,52 @@ export class NativeAdView extends Component {
 
   render() {
     const { nativeAd } = this.state;
+
+    console.log(nativeAd)
     if (nativeAd?.type !== 'native') {
       return null;
     }
     return (
-      <TriggerableView onPress={this.onPress} style={{ flexDirection: 'column', borderWidth: 1 }}>
-        <View style={{backgroundColor: 'rgba(52, 52, 52, 0.5)'/*, position: 'absolute', top:0, left:0, width: '100%', height: '100%'*/}}>
-          <View>
-            <Image style={{ width: 80, height: 80 }} />
-            <Text>icon.uri: {nativeAd?.icon.uri}</Text>
-            <View
-              style={{ flexDirection: 'column', paddingHorizontal: 10, flex: 1 }}
-            >
-              <Text style={{ fontSize: 18 }}>
-                headline: {nativeAd?.headline}
-              </Text>
-              <Text>advertiserName: {nativeAd?.advertiserName}</Text>
-              <Text>starRating: {nativeAd?.starRating}</Text>
-              <Text>storeName: {nativeAd?.storeName}</Text>
-              <Text>price: {nativeAd?.price}</Text>
-              <Text style={{ fontSize: 10 }}>
-                bodyText: {nativeAd?.bodyText}
-              </Text>
-            </View>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <View
-              ref={el => (this._triggerView = el)}>
-              <Text
-                style={{
-                  fontSize: 15,
-                  color: '#a70f0a',
-                  paddingVertical: 10,
-                  paddingHorizontal: 30,
-                  elevation: 3,
-                  borderTopWidth: 0,
-                  margin: 10,
-                  borderRadius: 6,
-                }}
-              >
-                callToActionText: {nativeAd?.callToActionText}
-              </Text>
-            </View>
+      <View onPress={this.onPress} style={{ flexDirection: 'column', borderWidth: 1, position: 'relative' }}>
+        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}} />
+        <View>
+          <Image style={{ width: 80, height: 80 }} />
+          <Text>icon.uri: {nativeAd?.icon.uri}</Text>
+          <View
+            style={{ flexDirection: 'column', paddingHorizontal: 10, flex: 1 }}
+          >
+            <Text style={{ fontSize: 18 }}>
+              headline: {nativeAd?.headline}
+            </Text>
+            <Text>advertiserName: {nativeAd?.advertiserName}</Text>
+            <Text>starRating: {nativeAd?.starRating}</Text>
+            <Text>storeName: {nativeAd?.storeName}</Text>
+            <Text>price: {nativeAd?.price}</Text>
+            <Text style={{ fontSize: 10 }}>
+              bodyText: {nativeAd?.bodyText}
+            </Text>
           </View>
         </View>
-      </TriggerableView>
+        <View style={{ alignItems: 'center' }}>
+          <View
+            ref={el => (this._triggerView = el)}>
+            <Text
+              style={{
+                fontSize: 15,
+                color: '#a70f0a',
+                paddingVertical: 10,
+                paddingHorizontal: 30,
+                elevation: 3,
+                borderTopWidth: 0,
+                margin: 10,
+                borderRadius: 6,
+              }}
+            >
+              callToActionText: {nativeAd?.callToActionText}
+            </Text>
+          </View>
+        </View>
+      </View>
     );
   }
 }

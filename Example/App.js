@@ -233,7 +233,20 @@ export default class Example extends Component {
           <BannerExample
             style={{ padding: 20}}
             title="DFP - Native ad">
-            <NativeAdView adsManager={adsManager} ref={el => (this._appNativeExample = el)} />
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <NativeAdView
+                style={{ width: '100%'}}
+                adsManager={adsManager}
+                onSizeChange={(data) => console.log(data)}
+                // adSize="300x600"
+                // validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+                adUnitID="/83069739/jeff"
+                adStyles={adStyles}
+                onAdFailedToLoad={error => {
+                  console.log(error);
+                }}
+                ref={el => (this._appNativeExample = el)} />
+            </View>
             <Button
               title="Reload"
               onPress={() => this._appNativeExample.reloadAd()}

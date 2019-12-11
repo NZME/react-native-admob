@@ -1,5 +1,6 @@
 package com.sbugert.rnadmob;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
@@ -30,6 +31,7 @@ import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.gms.ads.formats.OnPublisherAdViewLoadedListener;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;
@@ -41,6 +43,8 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
     String[] testDevices;
     String adUnitID;
+    AdSize[] validAdSizes;
+    AdSize adSize;
 
     /**
      * @{RCTEventEmitter} instance used for sending events back to JS
@@ -81,6 +85,22 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
                         .setVideoOptions(videoOptions)
                         .build();
 
+                ArrayList<AdSize> adSizes = new ArrayList<AdSize>();
+                if (adSize != null) {
+                    adSizes.add(adSize);
+                }
+                if (validAdSizes != null) {
+                    for (int i = 0; i < validAdSizes.length; i++) {
+                        adSizes.add(validAdSizes[i]);
+                    }
+                }
+
+                if (adSizes.size() == 0) {
+                    adSizes.add(AdSize.BANNER);
+                }
+
+                AdSize[] adSizesArray = adSizes.toArray(new AdSize[adSizes.size()]);
+
 //                AdSize[] validAdSizes = new AdSize[]{AdSize.BANNER,
 //                        AdSize.FULL_BANNER,
 //                        AdSize.LARGE_BANNER,
@@ -92,13 +112,7 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
                 adLoader = new AdLoader.Builder(reactContext, adUnitID)
                         .forUnifiedNativeAd(RNNativeAdsAdView.this)
-                        .forPublisherAdView(RNNativeAdsAdView.this, AdSize.BANNER, AdSize.FULL_BANNER,
-                                AdSize.LARGE_BANNER,
-                                AdSize.LEADERBOARD,
-                                AdSize.MEDIUM_RECTANGLE,
-                                AdSize.WIDE_SKYSCRAPER,
-                                AdSize.SMART_BANNER,
-                                AdSize.FLUID)
+                        .forPublisherAdView(RNNativeAdsAdView.this, adSizesArray)
 //                        .forCustomTemplateAd()
                         .withAdListener(new AdListener() {
                             @Override
@@ -196,10 +210,26 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
         if (unifiedNativeAdView != null) {
             for (View view : clickableViews) {
                 Log.w("clickableView", view.toString());
-                unifiedNativeAdView.addView(view);
+//                removeView(view);
+//                unifiedNativeAdView.addView(view);
                 unifiedNativeAdView.setCallToActionView(view);
                 this.clickableView = view;
             }
+
+            unifiedNativeAdView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+
+            int viewWidth = this.getMeasuredWidth();
+            int viewHeight = this.getMeasuredHeight();
+
+            int left = this.getLeft();
+            int top = this.getTop();
+            Log.w("viewWidth", Integer.toString(viewWidth));
+            Log.w("viewHeight", Integer.toString(viewHeight));
+            Log.w("left", Integer.toString(left));
+            Log.w("top", Integer.toString(top));
+            unifiedNativeAdView.measure(viewWidth, viewHeight);
+            unifiedNativeAdView.layout(left, top, left + viewWidth, top + viewHeight);
+            unifiedNativeAdView.setBackgroundColor(Color.GREEN);
         }
     }
 
@@ -346,6 +376,14 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
     private void sendEvent(String name, @Nullable WritableMap event) {
         mEventEmitter.receiveEvent(getId(), name, event);
+    }
+
+    public void setAdSize(AdSize adSize) {
+        this.adSize = adSize;
+    }
+
+    public void setValidAdSizes(AdSize[] adSizes) {
+        this.validAdSizes = adSizes;
     }
 
     @Override

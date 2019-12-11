@@ -2,6 +2,7 @@ import React from 'react';
 import { findNodeHandle, requireNativeComponent, UIManager } from 'react-native';
 import { TriggerableContext } from './TriggerableViewManager';
 import AdsManager from './NativeAdsManager';
+import {string} from "prop-types";
 
 const areSetsEqual = (a, b) => {
   if (a.size !== b.size)
@@ -158,6 +159,8 @@ export default (Component) => class NativeAdWrapper extends React.Component {
     return (
       <NativeAdView
         style={[this.props.style, this.state.style]}
+        adSize={this.props.adSize}
+        validAdSizes={this.props.validAdSizes}
         ref={this.handleNativeAdViewMount}
         adsManager={adsManager.toJSON()}
         onAdLoaded={this.handleOnAdLoaded}
