@@ -15,11 +15,17 @@
 #include "RCTConvert+GADAdSize.h"
 
 @implementation RNDFPPublisherNativeAdView
+{
+    DFPBannerView  *_bannerView;
+}
 
 - (void)dealloc
 {
     _adLoader.delegate = nil;
     _nativeAd.delegate = nil;
+//    _bannerView.delegate = nil;
+//    _bannerView.adSizeDelegate = nil;
+//    _bannerView.appEventDelegate = nil;
 }
 
 -(void)layoutSubviews
@@ -32,6 +38,9 @@
     // Loads an ad for any of app install, content, or custom native ads.
     NSMutableArray *adTypes = [[NSMutableArray alloc] init];
     [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
+    if (_validAdSizes != nil || _adSize != nil) {
+        [adTypes addObject:kGADAdLoaderAdTypeDFPBanner];
+    }
 
     GADVideoOptions *videoOptions = [[GADVideoOptions alloc] init];
     videoOptions.startMuted = true;
@@ -159,9 +168,9 @@
     CGFloat left = [RCTConvert CGFloat:padding[@"left"]];
     CGFloat bottom = [RCTConvert CGFloat:padding[@"bottom"]];
     CGFloat right = [RCTConvert CGFloat:padding[@"right"]];
-//    view.bounds = UIEdgeInsetsInsetRect(view.frame, UIEdgeInsetsMake(top, left, bottom, right));
-    view.bounds = CGRectInset(view.frame, -top, -right);
-    
+    view.bounds = UIEdgeInsetsInsetRect(view.bounds, UIEdgeInsetsMake(-top, -left, -bottom, -right));
+//    view.bounds = CGRectInset(view.frame, top, right);
+
     NSMutableDictionary *margin = [[NSMutableDictionary alloc] init];
     margin[@"top"] = @((CGFloat)0);
     margin[@"right"] = @((CGFloat)0);
@@ -218,9 +227,15 @@
         if (styles[@"fontSize"]) {
             [(UILabel *)view setFont: [((UILabel *)view).font fontWithSize:[RCTConvert NSInteger:styles[@"fontSize"]]]];
         }
-//        if (styles[@"lineHeight"]) {
-//            [(UILabel *)view setFont: [((UILabel *)view).font lineHeight:[RCTConvert NSInteger:styles[@"lineHeight"]]];
-//        }
+        if (styles[@"lineHeight"]) {
+            NSMutableAttributedString* attrString = [[NSMutableAttributedString  alloc] initWithString:((UILabel *)view).text];
+            NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+            [style setLineSpacing:[RCTConvert NSInteger:styles[@"lineHeight"]]];
+            [attrString addAttribute:NSParagraphStyleAttributeName
+                value:style
+                range:NSMakeRange(0, attrString.length)];
+            ((UILabel *)view).attributedText = attrString;
+        }
         if (styles[@"fontFamily"]) {
             UIFont* currentFont = ((UILabel *)view).font;
             [(UILabel *)view setFont: [UIFont
@@ -251,6 +266,10 @@
     // Create and place ad in view hierarchy.
     GADUnifiedNativeAdView *nativeAdView = [[NSBundle mainBundle] loadNibNamed:@"UnifiedNativeAdViewSmall" owner:nil options:nil].firstObject;
 
+    nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
+    nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
+    nativeAdView.clipsToBounds = YES;
+    
     nativeAdView.nativeAd = nativeAd;
 
     // Populate the native ad view with the native ad assets.
@@ -261,13 +280,7 @@
             [self applyStyles:nativeAdView.headlineView styles:(NSDictionary *)_adStyles[@"ad_headline"]];
         }
     }
-    
-    if (nativeAdView.advertiserView) {
-        ((UILabel *)nativeAdView.advertiserView).text = @"Sponsored";
-        if (_adStyles[@"ad_sponsored"]) {
-            [self applyStyles:nativeAdView.headlineView styles:(NSDictionary *)_adStyles[@"ad_headline"]];
-        }
-    }
+
     if (nativeAdView.advertiserView) {
         ((UILabel *)nativeAdView.advertiserView).text = @"Sponsored";
         if (_adStyles[@"ad_sponsored"]) {
@@ -357,40 +370,27 @@
 //    }
 
     // Remove previous ad view.
+    [_bannerView removeFromSuperview];
     [self.nativeAdView removeFromSuperview];
     self.nativeAdView = nativeAdView;
 
     [self addSubview:nativeAdView];
-    NSLog(@"all subview width: %f", nativeAdView.frame.size.width);
-    NSLog(@"all subview height: %f", nativeAdView.frame.size.height);
-    NSLog(@"all subview x: %f", nativeAdView.frame.origin.x);
-    NSLog(@"all subview y: %f", nativeAdView.frame.origin.y);
-//
-//    CGFloat subViewHeight = 0;
-//    for (UIView *subview in nativeAdView.subviews)
-//    {
-//        if ([subview isKindOfClass:[UILabel class]]) {
-//            subViewHeight = subViewHeight + subview.frame.size.height;
-//        }
-//    }
-//    NSLog(@"all subview height: %f", subViewHeight);
-//
-//    if (subViewHeight < 200) {
-//        subViewHeight = 200;
-//    }
-//
-//    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
-//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-//
     
-    self.frame = CGRectMake(self.frame.origin.x,
+    CGFloat subViewHeight = nativeAdView.iconView.frame.size.height + nativeAdView.iconView.frame.origin.y;
+    if (nativeAdView.bodyView.frame.size.height + nativeAdView.bodyView.frame.origin.y > subViewHeight) {
+        subViewHeight = nativeAdView.bodyView.frame.size.height + nativeAdView.bodyView.frame.origin.y;
+    }
+
+    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
+
+//    NSLog(@"intrinsicContentSize.height: %f", nativeAdView.intrinsicContentSize.height);
+    
+    self.bounds = CGRectMake(self.frame.origin.x,
         self.frame.origin.y,
         self.frame.size.width,
-        nativeAdView.frame.size.height);
-
-    [self sizeToFit];
-    [nativeAdView sizeToFit];
+        subViewHeight);
     
     if (self.onSizeChange) {
         self.onSizeChange(@{
@@ -446,7 +446,7 @@
 
 #pragma mark GADAdLoaderDelegate implementation
 
-/// Tells the delegate an ad request failed.
+/// Tells the delegate an ad request failed.UnifiedNativeAdView
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(GADRequestError *)error {
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
@@ -470,8 +470,124 @@
 
 - (void)adLoader:(GADAdLoader *)adLoader
     didReceiveNativeAd:(GADUnifiedNativeAd *)nativeAd {
+    NSLog(@"Ad is Loaded: %@", nativeAd);
     if (self.onAdLoaded) {
-        self.onAdLoaded(@{});
+        /*
+         
+
+
+
+
+
+         if (unifiedNativeAd.getIcon() == null) {
+             ad.putString("icon", null);
+         } else {
+             WritableMap icon = Arguments.createMap();
+             icon.putString("uri", unifiedNativeAd.getIcon().getUri().toString());
+             icon.putInt("width", unifiedNativeAd.getIcon().getWidth());
+             icon.putInt("height", unifiedNativeAd.getIcon().getHeight());
+             icon.putDouble("scale", unifiedNativeAd.getIcon().getScale());
+             ad.putMap("icon", icon);
+         }
+
+         if (unifiedNativeAd.getImages().size() == 0) {
+             ad.putArray("images", null);
+         } else {
+             WritableArray images = Arguments.createArray();
+             for (NativeAd.Image image : unifiedNativeAd.getImages()) {
+                 WritableMap imageMap = Arguments.createMap();
+                 imageMap.putString("uri", image.getUri().toString());
+                 imageMap.putInt("width", image.getWidth());
+                 imageMap.putInt("height", image.getHeight());
+                 imageMap.putDouble("scale", image.getScale());
+                 images.pushMap(imageMap);
+             }
+             ad.putArray("images", images);
+         }
+         *headline;
+
+         */
+        NSMutableDictionary *ad = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                   @"native", @"type",
+                                   nativeAd.headline, @"headline",
+                                   nativeAd.body, @"bodyText",
+                                   nativeAd.callToAction, @"callToActionText",
+                                   nativeAd.advertiser, @"advertiserName",
+                                   nativeAd.starRating, @"starRating",
+                                   nativeAd.store, @"storeName",
+                                   nativeAd.price, @"price",
+                                   nil, @"icon",
+                                   nil, @"images",
+                                   nil];
+
+        if (nativeAd.icon != nil) {
+            ad[@"icon"] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                           nativeAd.icon.imageURL, @"uri",
+                           nativeAd.icon.image.size.width, @"width",
+                           nativeAd.icon.image.size.height, @"height",
+                           nativeAd.icon.scale, @"scale",
+                           nil];
+        }
+        
+        if (nativeAd.images != nil) {
+            NSMutableArray *images = [NSMutableArray init];
+            [nativeAd.images enumerateObjectsUsingBlock:^(GADNativeAdImage *value, NSUInteger idx, __unused BOOL *stop) {
+                [images addObject:[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                   value.imageURL, @"uri",
+                                   value.image.size.width, @"width",
+                                   value.image.size.height, @"height",
+                                   value.scale, @"scale",
+                                   nil]];
+            }];
+            ad[@"images"] = images;
+        }
+
+        RCTLogWarn(@"Invalid adSize %@", ad);
+
+        self.onAdLoaded(ad);
+    }
+}
+
+#pragma mark DFPBannerAdLoaderDelegate implementation
+
+- (nonnull NSArray<NSValue *> *)validBannerSizesForAdLoader:
+(nonnull GADAdLoader *)adLoader {
+    NSMutableArray *validAdSizes = [NSMutableArray arrayWithArray:_validAdSizes];
+    if (_adSize != nil) {
+        GADAdSize adSize = [RCTConvert GADAdSize:_adSize];
+        if (GADAdSizeEqualToSize(adSize, kGADAdSizeInvalid)) {
+            RCTLogWarn(@"Invalid adSize %@", _adSize);
+        } else {
+            [validAdSizes addObject:NSValueFromGADAdSize(adSize)];
+        }
+    }
+    return validAdSizes;
+}
+
+- (void)adLoader:(nonnull GADAdLoader *)adLoader
+didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
+    NSLog(@"banner is Loaded: %@", bannerView);
+    [_bannerView removeFromSuperview];
+    [_nativeAdView removeFromSuperview];
+    _bannerView = bannerView;
+
+    [self addSubview:bannerView];
+
+//    bannerView.delegate = self;
+//    bannerView.adSizeDelegate = self;
+//    bannerView.appEventDelegate = self;
+    
+    if (self.onSizeChange) {
+        self.onSizeChange(@{
+                            @"type": @"banner",
+                            @"width": @(bannerView.frame.size.width),
+                            @"height": @(bannerView.frame.size.height) });
+    }
+    if (self.onAdLoaded) {
+        self.onAdLoaded(@{
+            @"type": @"banner",
+            @"gadSize": NSValueFromGADAdSize(bannerView.adSize),
+        });
     }
 }
 

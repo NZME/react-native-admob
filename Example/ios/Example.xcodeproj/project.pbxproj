@@ -461,11 +461,25 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/UnifiedNativeAdView.xib",
-				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/UnifiedNativeAdViewSmall.xib",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/SourceSansPro-Black.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/SourceSansPro-Bold.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/SourceSansPro-Regular.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/SourceSansPro-SemiBold.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/Stag-Book.otf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/Stag-BookItalic.otf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/fonts/Stag-Medium.otf",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/UnifiedNativeAdView.xib",
+				"${PODS_ROOT}/../../node_modules/react-native-admob/ios/Res/UnifiedNativeAdViewSmall.xib",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SourceSansPro-Black.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SourceSansPro-Bold.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SourceSansPro-Regular.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SourceSansPro-SemiBold.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Stag-Book.otf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Stag-BookItalic.otf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Stag-Medium.otf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UnifiedNativeAdView.nib",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UnifiedNativeAdViewSmall.nib",
 			);

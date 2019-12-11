@@ -8,7 +8,7 @@
 
 @class RCTEventDispatcher;
 
-@interface RNDFPPublisherNativeAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, GADVideoControllerDelegate>
+@interface RNDFPPublisherNativeAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, DFPBannerAdLoaderDelegate, GADVideoControllerDelegate>
 
 /// You must keep a strong reference to the GADAdLoader during the ad loading process.
 @property(nonatomic, strong) GADAdLoader *adLoader;
