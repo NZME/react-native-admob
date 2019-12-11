@@ -1,7 +1,5 @@
 package com.sbugert.rnadmob;
 
-import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -39,7 +37,6 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
     protected UnifiedNativeAdView unifiedNativeAdView;
     protected PublisherAdView publisherAdView;
     protected ThemedReactContext context;
-    protected View clickableView;
 
     String[] testDevices;
     String adUnitID;
@@ -208,34 +205,40 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
     public void registerViewsForInteraction(List<View> clickableViews) {
         if (unifiedNativeAdView != null) {
-            for (View view : clickableViews) {
-                Log.w("clickableView", view.toString());
-//                removeView(view);
-//                unifiedNativeAdView.addView(view);
-                unifiedNativeAdView.setCallToActionView(view);
-                this.clickableView = view;
-            }
-
-            unifiedNativeAdView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 
             int viewWidth = this.getMeasuredWidth();
             int viewHeight = this.getMeasuredHeight();
 
-            int left = this.getLeft();
-            int top = this.getTop();
-            Log.w("viewWidth", Integer.toString(viewWidth));
-            Log.w("viewHeight", Integer.toString(viewHeight));
-            Log.w("left", Integer.toString(left));
-            Log.w("top", Integer.toString(top));
+            int left = 0;
+            int top = 0;
+
+            if (viewHeight <= 0) {
+                viewHeight = 1000;
+            }
+
+            unifiedNativeAdView.getLayoutParams().width = viewWidth;
+            unifiedNativeAdView.getLayoutParams().height = viewHeight;
+
             unifiedNativeAdView.measure(viewWidth, viewHeight);
             unifiedNativeAdView.layout(left, top, left + viewWidth, top + viewHeight);
-            unifiedNativeAdView.setBackgroundColor(Color.GREEN);
-        }
-    }
 
-    public void clickAd() {
-        if (this.clickableView != null) {
-            this.clickableView.performClick();
+            View tmpView = new View(context);
+            tmpView.layout(left, top, left + viewWidth, top + viewHeight);
+            unifiedNativeAdView.addView(tmpView);
+
+            tmpView.getLayoutParams().width = viewWidth;
+            tmpView.getLayoutParams().height = viewHeight;
+
+            unifiedNativeAdView.setCallToActionView(tmpView);
+
+//            try {
+//                for (View view : clickableViews) {
+//
+//                    ((ViewGroup) view.getParent()).removeView(view);
+//                    unifiedNativeAdView.addView(view);
+//                    unifiedNativeAdView.setCallToActionView(view);
+//                }
+//            } catch (Exception e) {}
         }
     }
 

@@ -32,7 +32,6 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
     public static final String EVENT_AD_LEFT_APPLICATION = "onAdLeftApplication";
     public static final String EVENT_APP_EVENT = "onAppEvent";
     public static final int COMMAND_RELOAD_AD = 1;
-    public static final int COMMAND_CLICK_AD = 2;
     private static String REACT_CLASS = "RNNativeAdsAdView";
     private ReactApplicationContext applicationContext;
 
@@ -129,8 +128,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                "reloadAd", COMMAND_RELOAD_AD,
-                "clickAd", COMMAND_CLICK_AD
+                "reloadAd", COMMAND_RELOAD_AD
         );
     }
 
@@ -139,9 +137,6 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
         switch (commandId) {
             case COMMAND_RELOAD_AD:
                 root.reloadAd();
-                break;
-            case COMMAND_CLICK_AD:
-                root.clickAd();
                 break;
         }
     }

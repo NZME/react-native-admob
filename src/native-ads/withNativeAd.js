@@ -131,15 +131,6 @@ export default (Component) => class NativeAdWrapper extends React.Component {
     );
   }
 
-  clickAd() {
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this.nativeAdViewRef),
-      UIManager.getViewManagerConfig('RNNativeAdsAdView').Commands
-        .clickAd,
-      null
-    );
-  }
-
   renderAdComponent(componentProps) {
     if (!this.state.nativeAd) {
       return null;

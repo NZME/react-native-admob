@@ -35,7 +35,6 @@ export default class Example extends Component {
   }
 
   componentDidMount() {
-    /*
     AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
     AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
 
@@ -85,20 +84,19 @@ export default class Example extends Component {
     );
 
     AdMobInterstitial.requestAd().catch(error => console.warn(error));
-     */
   }
 
   componentWillUnmount() {
-    // AdMobRewarded.removeAllListeners();
-    // AdMobInterstitial.removeAllListeners();
+    AdMobRewarded.removeAllListeners();
+    AdMobInterstitial.removeAllListeners();
   }
 
   showRewarded() {
-    // AdMobRewarded.showAd().catch(error => console.warn(error));
+    AdMobRewarded.showAd().catch(error => console.warn(error));
   }
 
   showInterstitial() {
-    // AdMobInterstitial.showAd().catch(error => console.warn(error));
+    AdMobInterstitial.showAd().catch(error => console.warn(error));
   }
 
   render() {
@@ -108,7 +106,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          {/*<BannerExample title="AdMob - Basic">
+          <BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="ca-app-pub-3940256099942544/2934735716"
@@ -229,7 +227,7 @@ export default class Example extends Component {
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>*/}
+          </BannerExample>
           <BannerExample
             style={{ padding: 20}}
             title="DFP - Native ad">
@@ -238,8 +236,8 @@ export default class Example extends Component {
                 style={{ width: '100%'}}
                 adsManager={adsManager}
                 onSizeChange={(data) => console.log(data)}
-                // adSize="300x600"
-                // validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+                adSize="300x600"
+                validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
                 adUnitID="/83069739/jeff"
                 adStyles={adStyles}
                 onAdFailedToLoad={error => {
