@@ -2,6 +2,7 @@ package com.sbugert.rnadmob;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.location.Location;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -12,16 +13,24 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableNativeArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
+import com.sbugert.rnadmob.enums.TargetingEnums;
+import com.sbugert.rnadmob.enums.TargetingEnums.TargetingTypes;
 
 public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
@@ -33,8 +42,16 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
     public static final String EVENT_AD_CLOSED = "interstitialAdClosed";
     public static final String EVENT_AD_LEFT_APPLICATION = "interstitialAdLeftApplication";
 
-    InterstitialAd mInterstitialAd;
+    PublisherInterstitialAd mInterstitialAd;
     String[] testDevices;
+    ReadableMap targeting;
+
+    CustomTargeting[] customTargeting;
+    String[] categoryExclusions;
+    String[] keywords;
+    String contentURL;
+    String publisherProvidedID;
+    Location location;
 
     private Promise mRequestAdPromise;
 
@@ -45,7 +62,7 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
     public RNAdMobInterstitialAdModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        mInterstitialAd = new InterstitialAd(reactContext);
+        mInterstitialAd = new PublisherInterstitialAd(reactContext);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -60,19 +77,19 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                         String errorString = "ERROR_UNKNOWN";
                         String errorMessage = "Unknown error";
                         switch (errorCode) {
-                            case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                            case PublisherAdRequest.ERROR_CODE_INTERNAL_ERROR:
                                 errorString = "ERROR_CODE_INTERNAL_ERROR";
                                 errorMessage = "Internal error, an invalid response was received from the ad server.";
                                 break;
-                            case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                            case PublisherAdRequest.ERROR_CODE_INVALID_REQUEST:
                                 errorString = "ERROR_CODE_INVALID_REQUEST";
                                 errorMessage = "Invalid ad request, possibly an incorrect ad unit ID was given.";
                                 break;
-                            case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                            case PublisherAdRequest.ERROR_CODE_NETWORK_ERROR:
                                 errorString = "ERROR_CODE_NETWORK_ERROR";
                                 errorMessage = "The ad request was unsuccessful due to network connectivity.";
                                 break;
-                            case AdRequest.ERROR_CODE_NO_FILL:
+                            case PublisherAdRequest.ERROR_CODE_NO_FILL:
                                 errorString = "ERROR_CODE_NO_FILL";
                                 errorMessage = "The ad request was successful, but no ad was returned due to lack of ad inventory.";
                                 break;
@@ -106,6 +123,40 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
             }
         });
     }
+
+    private CustomTargeting[] getCustomTargeting(ReadableMap customTargeting) {
+        ArrayList<CustomTargeting> list = new ArrayList<CustomTargeting>();
+
+        for (
+            ReadableMapKeySetIterator it = customTargeting.keySetIterator();
+            it.hasNextKey();
+        ) {
+            String key = it.nextKey();
+            String value = customTargeting.getString(key);
+            list.add(new CustomTargeting(key, value));
+        }
+
+        CustomTargeting[] targetingList = list.toArray(new CustomTargeting[list.size()]);
+        return targetingList;
+    }
+
+    private Location getLocation(ReadableMap locationObject) {
+        if (
+            locationObject.hasKey("latitude")
+            && locationObject.hasKey("longitude")
+            && locationObject.hasKey("accuracy")
+        ) {
+            Location locationClass = new Location("");
+            locationClass.setLatitude(locationObject.getDouble("latitude"));
+            locationClass.setLongitude(locationObject.getDouble("longitude"));
+            locationClass.setAccuracy((float) locationObject.getDouble("accuracy"));
+
+            return locationClass;
+        }
+
+        return null;
+    }
+
     private void sendEvent(String eventName, @Nullable WritableMap params) {
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
@@ -125,6 +176,59 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void setTargeting(ReadableMap targetingObjects) {
+        this.targeting = targetingObjects;
+
+        ReadableMapKeySetIterator targetings = targetingObjects.keySetIterator();
+
+        if (targetings.hasNextKey()) {
+            for (
+                ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
+                it.hasNextKey();
+            ) {
+                String targetingType = it.nextKey();
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CUSTOMTARGETING))) {
+                    ReadableMap customTargetingObject = targetingObjects.getMap(targetingType);
+                    CustomTargeting[] customTargetingArray = getCustomTargeting(customTargetingObject);
+                    this.customTargeting = customTargetingArray;
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CATEGORYEXCLUSIONS))) {
+                    ReadableArray categoryExclusionsArray = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)categoryExclusionsArray;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    this.categoryExclusions = list.toArray(new String[list.size()]);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.KEYWORDS))) {
+                    ReadableArray keywords = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)keywords;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    this.keywords = list.toArray(new String[list.size()]);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CONTENTURL))) {
+                    String contentURL = targetingObjects.getString(targetingType);
+                    this.contentURL = contentURL;
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.PUBLISHERPROVIDEDID))) {
+                    String publisherProvidedID = targetingObjects.getString(targetingType);
+                    this.publisherProvidedID = publisherProvidedID;
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.LOCATION))) {
+                    ReadableMap locationObject = targetingObjects.getMap(targetingType);
+                    Location location = getLocation(locationObject);
+                    this.location = location;
+                }
+            }
+        }
+
+    }
+
+    @ReactMethod
     public void requestAd(final Promise promise) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -133,17 +237,53 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                     promise.reject("E_AD_ALREADY_LOADED", "Ad is already loaded.");
                 } else {
                     mRequestAdPromise = promise;
-                    AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
+                    PublisherAdRequest.Builder adRequestBuilder = new PublisherAdRequest.Builder();
                     if (testDevices != null) {
                         for (int i = 0; i < testDevices.length; i++) {
                             String testDevice = testDevices[i];
                             if (testDevice == "SIMULATOR") {
-                                testDevice = AdRequest.DEVICE_ID_EMULATOR;
+                                testDevice = PublisherAdRequest.DEVICE_ID_EMULATOR;
                             }
                             adRequestBuilder.addTestDevice(testDevice);
                         }
                     }
-                    AdRequest adRequest = adRequestBuilder.build();
+
+                    if (customTargeting != null && customTargeting.length > 0) {
+                        for (int i = 0; i < customTargeting.length; i++) {
+                            String key = customTargeting[i].key;
+                            String value = customTargeting[i].value;
+                            if (!key.isEmpty() && !value.isEmpty()) {
+                                adRequestBuilder.addCustomTargeting(key, value);
+                            }
+                        }
+                    }
+                    if (categoryExclusions != null && categoryExclusions.length > 0) {
+                        for (int i =0; i < categoryExclusions.length; i++) {
+                            String categoryExclusion = categoryExclusions[i];
+                            if (!categoryExclusion.isEmpty()) {
+                                adRequestBuilder.addCategoryExclusion(categoryExclusion);
+                            }
+                        }
+                    }
+                    if (keywords != null && keywords.length > 0) {
+                        for (int i = 0; i < keywords.length; i++) {
+                            String keyword = keywords[i];
+                            if (!keyword.isEmpty()) {
+                                adRequestBuilder.addKeyword(keyword);
+                            }
+                        }
+                    }
+                    if (contentURL != null) {
+                        adRequestBuilder.setContentUrl(contentURL);
+                    }
+                    if (publisherProvidedID != null) {
+                        adRequestBuilder.setPublisherProvidedId(publisherProvidedID);
+                    }
+                    if (location != null) {
+                        adRequestBuilder.setLocation(location);
+                    }
+
+                    PublisherAdRequest adRequest = adRequestBuilder.build();
                     mInterstitialAd.loadAd(adRequest);
                 }
             }
