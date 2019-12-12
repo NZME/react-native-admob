@@ -140,6 +140,12 @@ export default class Example extends Component {
               adSize="300x600"
               validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
               adUnitID="/83069739/jeff"
+              targeting={{
+                customTargeting: { group: 'nzme_user_test' },
+                categoryExclusions: ['media'],
+                contentURL: 'nzmetest://',
+                publisherProvidedID: 'provider_id_nzme',
+              }}
               ref={el => (this._adSizesExample = el)}
             />
             <Button
