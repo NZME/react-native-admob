@@ -229,6 +229,30 @@ export default class Example extends Component {
             />
           </BannerExample>
           <BannerExample
+            style={{ paddingTop: 5, paddingBottom: 10, paddingRight: 2, paddingLeft: 3, backgroundColor: '#A5A4A8' }}
+            title="DFP - Native ad">
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <PublisherNativeAd
+                style={{ width: '100%'}}
+                onSizeChange={(data) => console.log(data)}
+                adSize="300x600"
+                validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+                adUnitID="/83069739/jeff"
+                adStyles={adStyles}
+                onAdFailedToLoad={error => {
+                  console.log(error);
+                }}
+                ref={el => (this._appNativeExample = el)}
+              >
+              </PublisherNativeAd>
+            </View>
+            <Button
+              title="Reload"
+              onPress={() => this._appNativeExample.loadBanner()}
+              style={styles.button}
+            />
+          </BannerExample>
+          <BannerExample
             style={{ padding: 20}}
             title="DFP - Native ad">
             <View style={{alignItems: 'center', width: '100%'}}>
@@ -239,15 +263,14 @@ export default class Example extends Component {
                 adSize="300x600"
                 validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
                 adUnitID="/83069739/jeff"
-                adStyles={adStyles}
                 onAdFailedToLoad={error => {
                   console.log(error);
                 }}
-                ref={el => (this._appNativeExample = el)} />
+                ref={el => (this._appReactNativeExample = el)} />
             </View>
             <Button
               title="Reload"
-              onPress={() => this._appNativeExample.reloadAd()}
+              onPress={() => this._appReactNativeExample.reloadAd()}
               style={styles.button}
             />
           </BannerExample>

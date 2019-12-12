@@ -18,10 +18,6 @@
 @end
 
 @implementation RNNativeAdsManager
-{
-    NSString *_adUnitID;
-    NSArray *_testDevices;
-}
 
 RCT_EXPORT_MODULE(RNNativeAdsManager)
 
@@ -78,11 +74,11 @@ RCT_EXPORT_METHOD(registerViewsForInteraction:(nonnull NSNumber *)nativeAdViewTa
 
 RCT_EXPORT_METHOD(init:(NSString *)adUnitID testDevices:(NSArray *)testDevices)
 {
-   _testDevices = RNAdMobProcessTestDevices(testDevices, kGADSimulatorID);
-   _adUnitID = adUnitID;
-
     RNNativeAdsManager *adsManager = [RNNativeAdsManager alloc];
 
+    adsManager.adUnitID = adUnitID;
+    adsManager.testDevices = RNAdMobProcessTestDevices(testDevices, kGADSimulatorID);
+    
     _myAdChoiceViewAdUnitID = adUnitID;
 
     [_adsManagers setValue:adsManager forKey:adUnitID];

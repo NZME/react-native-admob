@@ -1,4 +1,5 @@
 #import "RNNativeAdsAdView.h"
+#import "RNNativeAdsManager.h"
 #import "RNAdMobUtils.h"
 #import <React/RCTConvert.h>
 
@@ -11,6 +12,8 @@
 @implementation RNNativeAdsAdView
 {
     DFPBannerView  *_bannerView;
+    NSString *_adUnitID;
+    NSArray *_testDevices;
 }
 
 - (void)dealloc
@@ -28,10 +31,9 @@
     _nativeAdView.frame = self.bounds;
 }
 
-- (void)loadBanner {
-_testDevices = testDevices;
-_adUnitID = adUnitID;
-
+- (void)loadAd:(RNNativeAdsManager *)adManager {
+    _adUnitID = adManager.adUnitID;
+    _testDevices = adManager.testDevices;
 
     // Loads an ad for any of app install, content, or custom native ads.
     NSMutableArray *adTypes = [[NSMutableArray alloc] init];
@@ -58,142 +60,10 @@ _adUnitID = adUnitID;
     [self.adLoader loadRequest:request];
 }
 
-- (void)setAdView:(GADUnifiedNativeAd *)nativeAd {
-    /* // Create and place ad in view hierarchy.
-    GADUnifiedNativeAdView *nativeAdView = [[NSBundle mainBundle] loadNibNamed:@"UnifiedNativeAdViewSmall" owner:nil options:nil].firstObject;
-
-    nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
-    nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
-    nativeAdView.clipsToBounds = YES;
-
-    nativeAdView.nativeAd = nativeAd;
-
-    // Populate the native ad view with the native ad assets.
-    // The headline and mediaContent are guaranteed to be present in every native ad.
-    if (nativeAdView.headlineView) {
-        ((UILabel *)nativeAdView.headlineView).text = nativeAd.headline;
-        if (_adStyles[@"ad_headline"]) {
-            [self applyStyles:nativeAdView.headlineView styles:(NSDictionary *)_adStyles[@"ad_headline"]];
-        }
-    }
-
-    if (nativeAdView.advertiserView) {
-        ((UILabel *)nativeAdView.advertiserView).text = @"Sponsored";
-        if (_adStyles[@"ad_sponsored"]) {
-            [self applyStyles:nativeAdView.advertiserView styles:(NSDictionary *)_adStyles[@"ad_sponsored"]];
-        }
-    }
-
-    if (nativeAdView.mediaView) {
-        nativeAdView.mediaView.mediaContent = nativeAd.mediaContent;
-
-        // This app uses a fixed width for the GADMediaView and changes its height
-        // to match the aspect ratio of the media content it displays.
-        if (nativeAd.mediaContent.aspectRatio > 0) {
-            NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:nativeAdView.mediaView
-                                         attribute:NSLayoutAttributeHeight
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:nativeAdView.mediaView
-                                         attribute:NSLayoutAttributeWidth
-                                        multiplier:(1 / nativeAd.mediaContent.aspectRatio)
-                                          constant:0];
-            heightConstraint.active = YES;
-        }
-
-        if (nativeAd.mediaContent.hasVideoContent) {
-            // By acting as the delegate to the GADVideoController, this ViewController
-            // receives messages about events in the video lifecycle.
-            nativeAd.mediaContent.videoController.delegate = self;
-        }
-    }
-
-    // These assets are not guaranteed to be present. Check that they are before
-    // showing or hiding them.
-    if (nativeAdView.bodyView) {
-        ((UILabel *)nativeAdView.bodyView).text = nativeAd.body;
-        nativeAdView.bodyView.hidden = nativeAd.body ? NO : YES;
-        if (_adStyles[@"ad_body"]) {
-            [self applyStyles:nativeAdView.bodyView styles:(NSDictionary *)_adStyles[@"ad_body"]];
-        }
-    }
-
-    if (nativeAdView.callToActionView) {
-        if ([nativeAdView.callToActionView isKindOfClass:[UIButton class]]) {
-            [((UIButton *)nativeAdView.callToActionView) setTitle:nativeAd.callToAction forState:UIControlStateNormal];
-
-            nativeAdView.callToActionView.hidden = nativeAd.callToAction ? NO : YES;
-        }
-
-        // In order for the SDK to process touch events properly, user interaction
-        // should be disabled.
-        nativeAdView.callToActionView.userInteractionEnabled = NO;
-
-        if (_adStyles[@"ad_call_to_action"]) {
-            [self applyStyles:nativeAdView.callToActionView styles:(NSDictionary *)_adStyles[@"ad_call_to_action"]];
-        }
-    }
-
-    if (nativeAdView.iconView) {
-        ((UIImageView *)nativeAdView.iconView).image = nativeAd.icon.image;
-        nativeAdView.iconView.hidden = nativeAd.icon ? NO : YES;
-        if (_adStyles[@"ad_app_icon"]) {
-            [self applyStyles:nativeAdView.iconView styles:(NSDictionary *)_adStyles[@"ad_app_icon"]];
-        }
-    }
-
-    if (nativeAdView.storeView) {
-        ((UILabel *)nativeAdView.storeView).text = nativeAd.store;
-        nativeAdView.storeView.hidden = nativeAd.store ? NO : YES;
-        if (_adStyles[@"ad_store"]) {
-            [self applyStyles:nativeAdView.storeView styles:(NSDictionary *)_adStyles[@"ad_store"]];
-        }
-    }
-
-    if (nativeAdView.priceView) {
-        ((UILabel *)nativeAdView.priceView).text = nativeAd.price;
-        nativeAdView.priceView.hidden = nativeAd.price ? NO : YES;
-        if (_adStyles[@"ad_price"]) {
-            [self applyStyles:nativeAdView.priceView styles:(NSDictionary *)_adStyles[@"ad_price"]];
-        }
-    }
-
-//    if (nativeAdView.advertiserView) {
-//        ((UILabel *)nativeAdView.advertiserView).text = nativeAd.advertiser;
-//        nativeAdView.advertiserView.hidden = nativeAd.advertiser ? NO : YES;
-//        if (_adStyles[@"ad_advertiser"]) {
-//            [self applyStyles:nativeAdView.advertiserView styles:(NSDictionary *)_adStyles[@"ad_advertiser"]];
-//        }
-//    }
-
-    // Remove previous ad view.
-    [_bannerView removeFromSuperview];
-    [self.nativeAdView removeFromSuperview];
-    self.nativeAdView = nativeAdView;
-
-    [self addSubview:nativeAdView];
-
-    CGFloat subViewHeight = nativeAdView.iconView.frame.size.height + nativeAdView.iconView.frame.origin.y;
-    if (nativeAdView.bodyView.frame.size.height + nativeAdView.bodyView.frame.origin.y > subViewHeight) {
-        subViewHeight = nativeAdView.bodyView.frame.size.height + nativeAdView.bodyView.frame.origin.y;
-    }
-
-    NSDictionary *viewDictionary = NSDictionaryOfVariableBindings(_nativeAdView);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_nativeAdView]|" options:0 metrics:nil views:viewDictionary]];
-
-//    NSLog(@"intrinsicContentSize.height: %f", nativeAdView.intrinsicContentSize.height);
-
-    self.bounds = CGRectMake(self.frame.origin.x,
-        self.frame.origin.y,
-        self.frame.size.width,
-        subViewHeight);
-
-    if (self.onSizeChange) {
-        self.onSizeChange(@{
-                            @"type": @"native",
-                            @"width": @(self.frame.size.width),
-                            @"height": @(self.frame.size.height) });
-    } */
+- (void)reloadAd {
+    GADRequest *request = [GADRequest request];
+    request.testDevices = _testDevices;
+    [self.adLoader loadRequest:request];
 }
 
 - (void)setadSize:(NSString *)adSize
@@ -228,18 +98,29 @@ _adUnitID = adUnitID;
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveUnifiedNativeAd:(GADUnifiedNativeAd *)nativeAd {
     NSLog(@"Received unified native ad: %@", nativeAd);
+    [_bannerView removeFromSuperview];
+    [_nativeAdView removeFromSuperview];
+    
+    GADUnifiedNativeAdView *nativeAdView = [[GADUnifiedNativeAdView alloc] init];
+    
+    _nativeAdView = nativeAdView;
+    nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
+    nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
+    nativeAdView.clipsToBounds = YES;
 
+    nativeAdView.nativeAd = nativeAd;
+
+    [self addSubview:nativeAdView];
+    
     self.nativeAd = nativeAd;
 
     // Set ourselves as the ad delegate to be notified of native ad events.
     nativeAd.delegate = self;
 
-    [self setAdView:nativeAd];
+    [self triggerAdLoadedEvent:nativeAd];
 }
 
-- (void)adLoader:(GADAdLoader *)adLoader
-    didReceiveNativeAd:(GADUnifiedNativeAd *)nativeAd {
-    NSLog(@"Ad is Loaded: %@", nativeAd);
+- (void)triggerAdLoadedEvent:(GADUnifiedNativeAd *)nativeAd {
     if (self.onAdLoaded) {
         NSMutableDictionary *ad = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                    @"native", @"type",
@@ -256,27 +137,25 @@ _adUnitID = adUnitID;
 
         if (nativeAd.icon != nil) {
             ad[@"icon"] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                           nativeAd.icon.imageURL, @"uri",
-                           nativeAd.icon.image.size.width, @"width",
-                           nativeAd.icon.image.size.height, @"height",
-                           nativeAd.icon.scale, @"scale",
-                           nil];
+                nativeAd.icon.imageURL.absoluteString, @"uri",
+                [[NSNumber numberWithFloat:nativeAd.icon.image.size.width] stringValue], @"width",
+                [[NSNumber numberWithFloat:nativeAd.icon.image.size.height] stringValue], @"height",
+                [[NSNumber numberWithFloat:nativeAd.icon.scale] stringValue], @"scale",
+                nil];
         }
 
         if (nativeAd.images != nil) {
-            NSMutableArray *images = [NSMutableArray init];
+            NSMutableArray *images = [[NSMutableArray alloc] init];
             [nativeAd.images enumerateObjectsUsingBlock:^(GADNativeAdImage *value, NSUInteger idx, __unused BOOL *stop) {
                 [images addObject:[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                   value.imageURL, @"uri",
-                                   value.image.size.width, @"width",
-                                   value.image.size.height, @"height",
-                                   value.scale, @"scale",
-                                   nil]];
+                    value.imageURL.absoluteString, @"uri",
+                    [[NSNumber numberWithFloat:value.image.size.width] stringValue], @"width",
+                    [[NSNumber numberWithFloat:value.image.size.height] stringValue], @"height",
+                    [[NSNumber numberWithFloat:value.scale] stringValue], @"scale",
+                    nil]];
             }];
             ad[@"images"] = images;
         }
-
-        RCTLogWarn(@"Invalid adSize %@", ad);
 
         self.onAdLoaded(ad);
     }
@@ -363,11 +242,31 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
     }
 }
 
-- (void)registerViewsForInteraction:(NSArray<UIView *> *)clickableViews
-{
-//   [_nativeAd registerViewForInteraction:self
-//                              viewController:RCTKeyWindow().rootViewController
-//                              clickableViews:clickableViews];
+- (void)registerViewsForInteraction:(NSArray<UIView *> *)clickableViews {
+    if (_nativeAdView != nil) {
+        [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
+            [view removeFromSuperview];
+            [_nativeAdView addSubview:view];
+            _nativeAdView.callToActionView = view;
+            
+             _nativeAdView.callToActionView.userInteractionEnabled = NO;
+        }];
+    }
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+- (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
+{
+    if (_nativeAdView != nil) {
+        [subview removeFromSuperview];
+        [_nativeAdView addSubview:subview];
+        _nativeAdView.callToActionView = subview;
+        _nativeAdView.callToActionView.userInteractionEnabled = NO;
+    } else {
+        [super insertReactSubview:subview atIndex:atIndex];
+    }
+}
+#pragma clang diagnostic pop
 
 @end

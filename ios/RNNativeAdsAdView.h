@@ -1,3 +1,5 @@
+#import "RNNativeAdsManager.h"
+
 #import <React/RCTView.h>
 #import <React/RCTBridge.h>
 #import <React/RCTComponent.h>
@@ -15,7 +17,7 @@
 @property(nonatomic, strong) GADUnifiedNativeAd *nativeAd;
 
 /// The native ad view that is being presented.
-@property(nonatomic, strong) UIView *nativeAdView;
+@property(nonatomic, strong) GADUnifiedNativeAdView *nativeAdView;
 
 @property (nonatomic, copy) NSString *adSize;
 @property (nonatomic, copy) NSArray *validAdSizes;
@@ -30,5 +32,6 @@
 
 - (void)registerViewsForInteraction:(NSArray<UIView *> *)clickableViews;
 - (void)reloadAd;
+- (void)loadAd:(RNNativeAdsManager *)adManager;
 
 @end

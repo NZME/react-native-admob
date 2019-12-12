@@ -1,3 +1,4 @@
+#import "RNNativeAdsManager.h"
 #import "RNNativeAdsAdViewManager.h"
 #import "RNNativeAdsAdView.h"
 
