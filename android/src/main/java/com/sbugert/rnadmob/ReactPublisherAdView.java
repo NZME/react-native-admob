@@ -1,6 +1,7 @@
 package com.sbugert.rnadmob;
 
 import android.content.Context;
+import android.location.Location;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -12,11 +13,13 @@ import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
 
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
 
 class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
 
@@ -26,6 +29,15 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     AdSize[] validAdSizes;
     String adUnitID;
     AdSize adSize;
+
+    // Targeting
+    Boolean hasTargeting = false;
+    CustomTargeting[] customTargeting;
+    String[] categoryExclusions;
+    String[] keywords;
+    String contentURL;
+    String publisherProvidedID;
+    Location location;
 
     public ReactPublisherAdView(final Context context) {
         super(context);
@@ -148,6 +160,46 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
                 adRequestBuilder.addTestDevice(testDevice);
             }
         }
+
+
+        // Targeting
+        if (hasTargeting) {
+            if (customTargeting != null && customTargeting.length > 0) {
+                for (int i = 0; i < customTargeting.length; i++) {
+                    String key = customTargeting[i].key;
+                    String value = customTargeting[i].value;
+                    if (!key.isEmpty() && !value.isEmpty()) {
+                        adRequestBuilder.addCustomTargeting(key, value);
+                    }
+                }
+            }
+            if (categoryExclusions != null && categoryExclusions.length > 0) {
+                for (int i =0; i < categoryExclusions.length; i++) {
+                    String categoryExclusion = categoryExclusions[i];
+                    if (!categoryExclusion.isEmpty()) {
+                        adRequestBuilder.addCategoryExclusion(categoryExclusion);
+                    }
+                }
+            }
+            if (keywords != null && keywords.length > 0) {
+                for (int i = 0; i < keywords.length; i++) {
+                    String keyword = keywords[i];
+                    if (!keyword.isEmpty()) {
+                        adRequestBuilder.addKeyword(keyword);
+                    }
+                }
+            }
+            if (contentURL != null) {
+                adRequestBuilder.setContentUrl(contentURL);
+            }
+            if (publisherProvidedID != null) {
+                adRequestBuilder.setPublisherProvidedId(publisherProvidedID);
+            }
+            if (location != null) {
+                adRequestBuilder.setLocation(location);
+            }
+        }
+
         PublisherAdRequest adRequest = adRequestBuilder.build();
         this.adView.loadAd(adRequest);
     }
@@ -166,6 +218,31 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         this.testDevices = testDevices;
     }
 
+    // Targeting
+    public void setCustomTargeting(CustomTargeting[] customTargeting) {
+        this.customTargeting = customTargeting;
+    }
+
+    public void setCategoryExclusions(String[] categoryExclusions) {
+        this.categoryExclusions = categoryExclusions;
+    }
+
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+    }
+
+    public void setContentURL(String contentURL) {
+        this.contentURL = contentURL;
+    }
+
+    public void setPublisherProvidedID(String publisherProvidedID) {
+        this.publisherProvidedID = publisherProvidedID;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+    
     public void setAdSize(AdSize adSize) {
         this.adSize = adSize;
     }
