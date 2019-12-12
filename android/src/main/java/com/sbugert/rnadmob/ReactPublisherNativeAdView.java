@@ -5,7 +5,7 @@ import java.util.List;
 import java.io.IOException;
 
 import android.content.Context;
-
+import android.location.Location;
 import androidx.annotation.Nullable;
 
 import android.util.Log;
@@ -47,6 +47,7 @@ import com.google.android.gms.ads.formats.NativeAdOptions;
 
 import java.util.ArrayList;
 
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
 
 class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;
@@ -59,6 +60,15 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
     String adUnitID;
     AdSize[] validAdSizes;
     AdSize adSize;
+
+    // Targeting
+    Boolean hasTargeting = false;
+    CustomTargeting[] customTargeting;
+    String[] categoryExclusions;
+    String[] keywords;
+    String contentURL;
+    String publisherProvidedID;
+    Location location;
 
     public ReactPublisherNativeAdView(final ThemedReactContext context, ReactApplicationContext applicationContext) {
         super(context);
@@ -642,6 +652,45 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
                 adRequestBuilder.addTestDevice(testDevice);
             }
         }
+
+        // Targeting
+        if (hasTargeting) {
+            if (customTargeting != null && customTargeting.length > 0) {
+                for (int i = 0; i < customTargeting.length; i++) {
+                    String key = customTargeting[i].key;
+                    String value = customTargeting[i].value;
+                    if (!key.isEmpty() && !value.isEmpty()) {
+                        adRequestBuilder.addCustomTargeting(key, value);
+                    }
+                }
+            }
+            if (categoryExclusions != null && categoryExclusions.length > 0) {
+                for (int i =0; i < categoryExclusions.length; i++) {
+                    String categoryExclusion = categoryExclusions[i];
+                    if (!categoryExclusion.isEmpty()) {
+                        adRequestBuilder.addCategoryExclusion(categoryExclusion);
+                    }
+                }
+            }
+            if (keywords != null && keywords.length > 0) {
+                for (int i = 0; i < keywords.length; i++) {
+                    String keyword = keywords[i];
+                    if (!keyword.isEmpty()) {
+                        adRequestBuilder.addKeyword(keyword);
+                    }
+                }
+            }
+            if (contentURL != null) {
+                adRequestBuilder.setContentUrl(contentURL);
+            }
+            if (publisherProvidedID != null) {
+                adRequestBuilder.setPublisherProvidedId(publisherProvidedID);
+            }
+            if (location != null) {
+                adRequestBuilder.setLocation(location);
+            }
+        }
+
         PublisherAdRequest adRequest = adRequestBuilder.build();
         this.adLoader.loadAd(adRequest);
     }
@@ -669,6 +718,31 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
     public void setValidAdSizes(AdSize[] adSizes) {
         this.validAdSizes = adSizes;
+    }
+
+    // Targeting
+    public void setCustomTargeting(CustomTargeting[] customTargeting) {
+        this.customTargeting = customTargeting;
+    }
+
+    public void setCategoryExclusions(String[] categoryExclusions) {
+        this.categoryExclusions = categoryExclusions;
+    }
+
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+    }
+
+    public void setContentURL(String contentURL) {
+        this.contentURL = contentURL;
+    }
+
+    public void setPublisherProvidedID(String publisherProvidedID) {
+        this.publisherProvidedID = publisherProvidedID;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     @Override

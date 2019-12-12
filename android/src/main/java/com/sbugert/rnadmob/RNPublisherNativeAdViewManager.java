@@ -1,11 +1,13 @@
 package com.sbugert.rnadmob;
 
 import androidx.annotation.Nullable;
+import android.location.Location;
 import android.view.View;
 
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -17,6 +19,10 @@ import com.google.android.gms.ads.AdSize;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
+import com.sbugert.rnadmob.enums.TargetingEnums;
+import com.sbugert.rnadmob.enums.TargetingEnums.TargetingTypes;
+
 public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublisherNativeAdView> {
 
     public static final String REACT_CLASS = "RNDFPPublisherNativeAdView";
@@ -26,6 +32,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
     public static final String PROP_AD_UNIT_ID = "adUnitID";
     public static final String PROP_AD_STYLES = "adStyles";
     public static final String PROP_TEST_DEVICES = "testDevices";
+    public static final String PROP_TARGETING = "targeting";
 
     public static final String EVENT_AD_LOADED = "onAdLoaded";
     public static final String EVENT_SIZE_CHANGE = "onSizeChange";
@@ -116,6 +123,63 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
         view.setTestDevices(list.toArray(new String[list.size()]));
     }
 
+    @ReactProp(name = PROP_TARGETING)
+    public void setPropTargeting(final ReactPublisherNativeAdView view, final ReadableMap targetingObjects) {
+
+        ReadableMapKeySetIterator targetings = targetingObjects.keySetIterator();
+
+        if (targetings.hasNextKey()) {
+            for (
+                ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
+                it.hasNextKey();
+            ) {
+                String targetingType = it.nextKey();
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CUSTOMTARGETING))) {
+                    view.hasTargeting = true;
+                    ReadableMap customTargetingObject = targetingObjects.getMap(targetingType);
+                    CustomTargeting[] customTargetingArray = getCustomTargeting(customTargetingObject);
+                    view.setCustomTargeting(customTargetingArray);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CATEGORYEXCLUSIONS))) {
+                    view.hasTargeting = true;
+                    ReadableArray categoryExclusionsArray = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)categoryExclusionsArray;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    view.setCategoryExclusions(list.toArray(new String[list.size()]));
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.KEYWORDS))) {
+                    view.hasTargeting = true;
+                    ReadableArray keywords = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)keywords;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    view.setKeywords(list.toArray(new String[list.size()]));
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CONTENTURL))) {
+                    view.hasTargeting = true;
+                    String contentURL = targetingObjects.getString(targetingType);
+                    view.setContentURL(contentURL);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.PUBLISHERPROVIDEDID))) {
+                    view.hasTargeting = true;
+                    String publisherProvidedID = targetingObjects.getString(targetingType);
+                    view.setPublisherProvidedID(publisherProvidedID);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.LOCATION))) {
+                    view.hasTargeting = true;
+                    ReadableMap locationObject = targetingObjects.getMap(targetingType);
+                    Location location = getLocation(locationObject);
+                    view.setLocation(location);
+                }
+            }
+        }
+    }
+
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
@@ -154,5 +218,38 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
             default:
                 return AdSize.BANNER;
         }
+    }
+
+    private CustomTargeting[] getCustomTargeting(ReadableMap customTargeting) {
+        ArrayList<CustomTargeting> list = new ArrayList<CustomTargeting>();
+
+        for (
+            ReadableMapKeySetIterator it = customTargeting.keySetIterator();
+            it.hasNextKey();
+        ) {
+            String key = it.nextKey();
+            String value = customTargeting.getString(key);
+            list.add(new CustomTargeting(key, value));
+        }
+
+        CustomTargeting[] targetingList = list.toArray(new CustomTargeting[list.size()]);
+        return targetingList;
+    }
+
+    private Location getLocation(ReadableMap locationObject) {
+        if (
+            locationObject.hasKey("latitude")
+            && locationObject.hasKey("longitude")
+            && locationObject.hasKey("accuracy")
+        ) {
+            Location locationClass = new Location("");
+            locationClass.setLatitude(locationObject.getDouble("latitude"));
+            locationClass.setLongitude(locationObject.getDouble("longitude"));
+            locationClass.setAccuracy((float) locationObject.getDouble("accuracy"));
+
+            return locationClass;
+        }
+
+        return null;
     }
 }
