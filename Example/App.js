@@ -12,8 +12,10 @@ import {
   AdMobInterstitial,
   AdMobRewarded,
   PublisherBanner,
-  PublisherNativeAd
+  PublisherNativeAd,
+  NativeAdsManager,
 } from 'react-native-admob';
+import NativeAdView from './NativeAdView';
 
 const BannerExample = ({ style, title, children, ...props }) => (
   <View {...props} style={[styles.example, style]}>
@@ -98,6 +100,9 @@ export default class Example extends Component {
   }
 
   render() {
+    // const adsManager = new NativeAdsManager("/6499/example/native", [AdMobInterstitial.simulatorId]);
+    const adsManager = new NativeAdsManager("/83069739/jeff", [AdMobInterstitial.simulatorId]);
+
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -232,6 +237,28 @@ export default class Example extends Component {
             <Button
               title="Reload"
               onPress={() => this._appNativeExample.loadBanner()}
+              style={styles.button}
+            />
+          </BannerExample>
+          <BannerExample
+            style={{ padding: 20}}
+            title="DFP - Native ad">
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <NativeAdView
+                style={{ width: '100%'}}
+                adsManager={adsManager}
+                onSizeChange={(data) => console.log(data)}
+                adSize="300x600"
+                validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+                adUnitID="/83069739/jeff"
+                onAdFailedToLoad={error => {
+                  console.log(error);
+                }}
+                ref={el => (this._appReactNativeExample = el)} />
+            </View>
+            <Button
+              title="Reload"
+              onPress={() => this._appReactNativeExample.reloadAd()}
               style={styles.button}
             />
           </BannerExample>
