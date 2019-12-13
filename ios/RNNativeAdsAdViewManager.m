@@ -38,6 +38,7 @@ RCT_CUSTOM_VIEW_PROPERTY(adsManager, NSString, RNNativeAdsAdView)
 
 RCT_EXPORT_VIEW_PROPERTY(adSize, NSString)
 RCT_EXPORT_VIEW_PROPERTY(validAdSizes, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(targeting, NSDictionary)
 
 RCT_EXPORT_VIEW_PROPERTY(onSizeChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAppEvent, RCTBubblingEventBlock)
