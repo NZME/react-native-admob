@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.platforms              = { :ios => '9.0', :tvos => '9.2' }
   s.source                 = { :git => 'https://github.com/sbugert/react-native-admob.git', :tag => "v#{version}" }
   s.source_files           = 'ios/*.{h,m}'
-  s.resources              = 'ios/*.xib'
+  s.resources              = 'ios/Res/**/*.{xib,ttf,otf}'
 
   # We can't add the Google-Mobile-Ads-SDK as a dependency, as it would prevent
   # this library to be used with `use_frameworks!`.

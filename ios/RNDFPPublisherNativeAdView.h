@@ -8,7 +8,7 @@
 
 @class RCTEventDispatcher;
 
-@interface RNDFPPublisherNativeAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, GADVideoControllerDelegate>
+@interface RNDFPPublisherNativeAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, DFPBannerAdLoaderDelegate, GADVideoControllerDelegate>
 
 /// You must keep a strong reference to the GADAdLoader during the ad loading process.
 @property(nonatomic, strong) GADAdLoader *adLoader;
@@ -19,6 +19,8 @@
 /// The native ad view that is being presented.
 @property(nonatomic, strong) UIView *nativeAdView;
 
+@property (nonatomic, copy) NSString *adSize;
+@property (nonatomic, copy) NSArray *validAdSizes;
 @property (nonatomic, copy) NSDictionary *adStyles;
 @property (nonatomic, copy) NSArray *testDevices;
 @property (nonatomic, copy) NSString *adUnitID;

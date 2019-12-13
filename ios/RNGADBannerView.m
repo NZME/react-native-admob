@@ -51,6 +51,7 @@
         CGSize size = CGSizeFromGADAdSize(_bannerView.adSize);
         if(!CGSizeEqualToSize(size, self.bounds.size)) {
             self.onSizeChange(@{
+                                @"type": @"banner",
                                 @"width": @(size.width),
                                 @"height": @(size.height)
                                 });
@@ -123,6 +124,7 @@ didFailToReceiveAdWithError:(GADRequestError *)error
 {
     CGSize adSize = CGSizeFromGADAdSize(size);
     self.onSizeChange(@{
+                              @"type": @"banner",
                               @"width": @(adSize.width),
                               @"height": @(adSize.height) });
 }

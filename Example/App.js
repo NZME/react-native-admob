@@ -12,10 +12,8 @@ import {
   AdMobInterstitial,
   AdMobRewarded,
   PublisherBanner,
-  PublisherNativeAd,
-  NativeAdsManager
+  PublisherNativeAd
 } from 'react-native-admob';
-import { default as NativeAdView } from './NativeAdView';
 
 const BannerExample = ({ style, title, children, ...props }) => (
   <View {...props} style={[styles.example, style]}>
@@ -36,7 +34,7 @@ export default class Example extends Component {
 
   componentDidMount() {
     AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
-    AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
+    AdMobRewarded.setAdUnitID('/83069739/jeff');
 
     AdMobRewarded.addEventListener('rewarded', reward =>
       console.log('AdMobRewarded => rewarded', reward),
@@ -64,7 +62,7 @@ export default class Example extends Component {
     AdMobRewarded.requestAd().catch(error => console.warn(error));
 
     AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
-    AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712');
+    AdMobInterstitial.setAdUnitID('/83069739/jeff');
 
     AdMobInterstitial.addEventListener('adLoaded', () =>
       console.log('AdMobInterstitial adLoaded'),
@@ -109,7 +107,7 @@ export default class Example extends Component {
           <BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
-              adUnitID="ca-app-pub-3940256099942544/2934735716"
+              adUnitID="/83069739/jeff"
               ref={el => (this._basicExample = el)}
             />
             <Button
@@ -120,7 +118,7 @@ export default class Example extends Component {
           <BannerExample title="Smart Banner">
             <AdMobBanner
               adSize="smartBannerPortrait"
-              adUnitID="ca-app-pub-3940256099942544/2934735716"
+              adUnitID="/83069739/jeff"
               ref={el => (this._smartBannerExample = el)}
             />
             <Button
@@ -140,29 +138,11 @@ export default class Example extends Component {
               onPress={this.showInterstitial}
             />
           </BannerExample>
-          <BannerExample
-            style={{ padding: 20, backgroundColor: '#FF0000' }}
-            title="DFP - Native ad">
-            <PublisherNativeAd
-              adUnitID="/6499/example/native"
-              adStyles={adStyles}
-              onAdFailedToLoad={error => {
-                console.log(error);
-              }}
-              ref={el => (this._appNativeExample = el)}
-            >
-            </PublisherNativeAd>
-            <Button
-              title="Reload"
-              onPress={() => this._appNativeExample.loadBanner()}
-              style={styles.button}
-            />
-          </BannerExample>
           <BannerExample title="DFP - Multiple Ad Sizes">
             <PublisherBanner
-              adSize="banner"
-              validAdSizes={['banner', 'largeBanner', 'mediumRectangle']}
-              adUnitID="/6499/example/APIDemo/AdSizes"
+              adSize="300x600"
+              validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
+              adUnitID="/83069739/jeff"
               ref={el => (this._adSizesExample = el)}
             />
             <Button
@@ -175,7 +155,7 @@ export default class Example extends Component {
             style={this.state.appEventsExampleStyle}>
             <PublisherBanner
               style={{ height: 50 }}
-              adUnitID="/6499/example/APIDemo/AppEvents"
+              adUnitID="/83069739/jeff"
               onAdFailedToLoad={error => {
                 console.warn(error);
               }}
@@ -202,7 +182,7 @@ export default class Example extends Component {
               ]}>
               <PublisherBanner
                 adSize="fluid"
-                adUnitID="/6499/example/APIDemo/Fluid"
+                adUnitID="/83069739/jeff"
                 ref={el => (this._appFluidAdSizeExample = el)}
                 style={{ flex: 1 }}
               />
@@ -281,23 +261,38 @@ export default class Example extends Component {
 }
 
 const adStyles = {
+  ad_sponsored: {
+    fontSize: 10,
+    lineHeight: 12,
+    padding: 5,
+    fontFamily: 'Stag-Medium',
+    textTransform: 'uppercase',
+    color: '#2F74BA',
+    backgroundColor: '#ECEDE9',
+  },
   ad_headline: {
-    padding:5,
-    fontSize: 20,
-    textTransform: "uppercase",
-    color: "#0000FF",
-    //fontFamily
+    fontSize: 19,
+    lineHeight: 22,
+    paddingTop: 3,
+    paddingBottom: 3,
+    fontFamily: 'Stag-Medium',
+    color: '#4C585E',
   },
   ad_body: {
-    padding:5,
-    fontSize: 20,
+    // padding:5,
+    fontSize: 16,
+    fontFamily: 'SourceSansPro-Regular',
+    color: '#4C585E',
   },
   ad_app_icon: {
-    padding: 20,
-    width: 100,
-    height: 100,
+    width: 111,
+    height: 88,
   },
   ad_call_to_action: {
+    paddingLeft: 10,
+    paddingTop: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
     backgroundColor: "#FFFFFF"
   },
 };

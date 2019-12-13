@@ -101,6 +101,7 @@ class ReactAdView extends ReactViewGroup {
             width = adSize.getWidth();
             height = adSize.getHeight();
         }
+        event.putString("type", "banner");
         event.putDouble("width", width);
         event.putDouble("height", height);
         sendEvent(RNAdMobBannerViewManager.EVENT_SIZE_CHANGE, event);

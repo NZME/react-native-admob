@@ -90,6 +90,7 @@
 {
     if (self.onSizeChange) {
         self.onSizeChange(@{
+                            @"type": @"banner",
                             @"width": @(adView.frame.size.width),
                             @"height": @(adView.frame.size.height) });
     }
@@ -139,6 +140,7 @@ didFailToReceiveAdWithError:(GADRequestError *)error
 {
     CGSize adSize = CGSizeFromGADAdSize(size);
     self.onSizeChange(@{
+                        @"type": @"banner",
                         @"width": @(adSize.width),
                         @"height": @(adSize.height) });
 }

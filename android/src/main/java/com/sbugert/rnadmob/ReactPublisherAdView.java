@@ -106,6 +106,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
             width = adSize.getWidth();
             height = adSize.getHeight();
         }
+        event.putString("type", "banner");
         event.putDouble("width", width);
         event.putDouble("height", height);
         sendEvent(RNPublisherBannerViewManager.EVENT_SIZE_CHANGE, event);
