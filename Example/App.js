@@ -245,6 +245,12 @@ export default class Example extends Component {
             title="DFP - Native ad">
             <View style={{alignItems: 'center', width: '100%'}}>
               <NativeAdView
+                targeting={{
+                  customTargeting: { group: 'nzme_user_test' },
+                  categoryExclusions: ['media'],
+                  contentURL: 'nzmetest://',
+                  publisherProvidedID: 'provider_id_nzme',
+                }}
                 style={{ width: '100%'}}
                 adsManager={adsManager}
                 onSizeChange={(data) => console.log(data)}

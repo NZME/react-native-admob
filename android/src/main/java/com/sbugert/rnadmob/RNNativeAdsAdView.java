@@ -43,6 +43,15 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
     AdSize[] validAdSizes;
     AdSize adSize;
 
+    // Targeting
+    Boolean hasTargeting = false;
+    CustomTargeting[] customTargeting;
+    String[] categoryExclusions;
+    String[] keywords;
+    String contentURL;
+    String publisherProvidedID;
+    Location location;    
+
     /**
      * @{RCTEventEmitter} instance used for sending events back to JS
      **/
@@ -175,6 +184,45 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
                         adRequestBuilder.addTestDevice(testDevice);
                     }
                 }
+
+                // Targeting
+                if (hasTargeting) {
+                    if (customTargeting != null && customTargeting.length > 0) {
+                        for (int i = 0; i < customTargeting.length; i++) {
+                            String key = customTargeting[i].key;
+                            String value = customTargeting[i].value;
+                            if (!key.isEmpty() && !value.isEmpty()) {
+                                adRequestBuilder.addCustomTargeting(key, value);
+                            }
+                        }
+                    }
+                    if (categoryExclusions != null && categoryExclusions.length > 0) {
+                        for (int i =0; i < categoryExclusions.length; i++) {
+                            String categoryExclusion = categoryExclusions[i];
+                            if (!categoryExclusion.isEmpty()) {
+                                adRequestBuilder.addCategoryExclusion(categoryExclusion);
+                            }
+                        }
+                    }
+                    if (keywords != null && keywords.length > 0) {
+                        for (int i = 0; i < keywords.length; i++) {
+                            String keyword = keywords[i];
+                            if (!keyword.isEmpty()) {
+                                adRequestBuilder.addKeyword(keyword);
+                            }
+                        }
+                    }
+                    if (contentURL != null) {
+                        adRequestBuilder.setContentUrl(contentURL);
+                    }
+                    if (publisherProvidedID != null) {
+                        adRequestBuilder.setPublisherProvidedId(publisherProvidedID);
+                    }
+                    if (location != null) {
+                        adRequestBuilder.setLocation(location);
+                    }
+                }
+
                 PublisherAdRequest adRequest = adRequestBuilder.build();
                 adLoader.loadAd(adRequest);
             }
@@ -196,6 +244,43 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
                             adRequestBuilder.addTestDevice(testDevice);
                         }
                     }
+                    // Targeting
+                    if (hasTargeting) {
+                        if (customTargeting != null && customTargeting.length > 0) {
+                            for (int i = 0; i < customTargeting.length; i++) {
+                                String key = customTargeting[i].key;
+                                String value = customTargeting[i].value;
+                                if (!key.isEmpty() && !value.isEmpty()) {
+                                    adRequestBuilder.addCustomTargeting(key, value);
+                                }
+                            }
+                        }
+                        if (categoryExclusions != null && categoryExclusions.length > 0) {
+                            for (int i =0; i < categoryExclusions.length; i++) {
+                                String categoryExclusion = categoryExclusions[i];
+                                if (!categoryExclusion.isEmpty()) {
+                                    adRequestBuilder.addCategoryExclusion(categoryExclusion);
+                                }
+                            }
+                        }
+                        if (keywords != null && keywords.length > 0) {
+                            for (int i = 0; i < keywords.length; i++) {
+                                String keyword = keywords[i];
+                                if (!keyword.isEmpty()) {
+                                    adRequestBuilder.addKeyword(keyword);
+                                }
+                            }
+                        }
+                        if (contentURL != null) {
+                            adRequestBuilder.setContentUrl(contentURL);
+                        }
+                        if (publisherProvidedID != null) {
+                            adRequestBuilder.setPublisherProvidedId(publisherProvidedID);
+                        }
+                        if (location != null) {
+                            adRequestBuilder.setLocation(location);
+                        }
+                    }                    
                     PublisherAdRequest adRequest = adRequestBuilder.build();
                     adLoader.loadAd(adRequest);
                 }
@@ -388,6 +473,31 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
     public void setValidAdSizes(AdSize[] adSizes) {
         this.validAdSizes = adSizes;
     }
+
+    // Targeting
+    public void setCustomTargeting(CustomTargeting[] customTargeting) {
+        this.customTargeting = customTargeting;
+    }
+
+    public void setCategoryExclusions(String[] categoryExclusions) {
+        this.categoryExclusions = categoryExclusions;
+    }
+
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+    }
+
+    public void setContentURL(String contentURL) {
+        this.contentURL = contentURL;
+    }
+
+    public void setPublisherProvidedID(String publisherProvidedID) {
+        this.publisherProvidedID = publisherProvidedID;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }    
 
     @Override
     public void onAppEvent(String name, String info) {

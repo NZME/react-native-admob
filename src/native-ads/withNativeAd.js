@@ -156,12 +156,13 @@ export default (Component) => class NativeAdWrapper extends React.Component {
         adsManager={adsManager.toJSON()}
         onAdLoaded={this.handleOnAdLoaded}
         onSizeChange={this.handleOnSizeChange}
-        // onAdFailedToLoad={this.handleOnAdFailedToLoad}
-        // onAdOpened={this.handleOnAdOpened}
-        // onAdClosed={this.handleOnAdClosed}
-        // onAdLeftApplication={this.handleOnAdLeftApplication}
-        // onAppEvent={this.handleOnAppEvent}
-        >
+        onAdFailedToLoad={this.handleOnAdFailedToLoad}
+        onAdOpened={this.handleOnAdOpened}
+        onAdClosed={this.handleOnAdClosed}
+        onAdLeftApplication={this.handleOnAdLeftApplication}
+        onAppEvent={this.handleOnAppEvent}
+        targeting={this.props.targeting}
+      >
         {this.renderAdComponent(rest)}
       </NativeAdView>
     );

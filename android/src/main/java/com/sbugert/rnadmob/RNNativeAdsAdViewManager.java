@@ -3,6 +3,7 @@ package com.sbugert.rnadmob;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 import android.view.View;
 
@@ -10,6 +11,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableNativeArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
@@ -19,10 +22,15 @@ import com.google.android.gms.ads.AdSize;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
+import com.sbugert.rnadmob.enums.TargetingEnums;
+import com.sbugert.rnadmob.enums.TargetingEnums.TargetingTypes;
+
 public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView> {
     public static final String PROP_AD_MANAGER = "adsManager";
     public static final String PROP_AD_SIZE = "adSize";
     public static final String PROP_VALID_AD_SIZES = "validAdSizes";
+    public static final String PROP_TARGETING = "targeting";
     public static final String EVENT_AD_LOADED = "onAdLoaded";
     public static final String EVENT_SIZE_CHANGE = "onSizeChange";
     public static final String EVENT_AD_FAILED_TO_LOAD = "onAdFailedToLoad";
@@ -102,6 +110,63 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
             adSizes[i] = getAdSizeFromString(adSizeString);
         }
         view.setValidAdSizes(adSizes);
+    }
+
+    @ReactProp(name = PROP_TARGETING)
+    public void setPropTargeting(final ReactPublisherAdView view, final ReadableMap targetingObjects) {
+
+        ReadableMapKeySetIterator targetings = targetingObjects.keySetIterator();
+
+        if (targetings.hasNextKey()) {
+            for (
+                ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
+                it.hasNextKey();
+            ) {
+                String targetingType = it.nextKey();
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CUSTOMTARGETING))) {
+                    view.hasTargeting = true;
+                    ReadableMap customTargetingObject = targetingObjects.getMap(targetingType);
+                    CustomTargeting[] customTargetingArray = getCustomTargeting(customTargetingObject);
+                    view.setCustomTargeting(customTargetingArray);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CATEGORYEXCLUSIONS))) {
+                    view.hasTargeting = true;
+                    ReadableArray categoryExclusionsArray = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)categoryExclusionsArray;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    view.setCategoryExclusions(list.toArray(new String[list.size()]));
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.KEYWORDS))) {
+                    view.hasTargeting = true;
+                    ReadableArray keywords = targetingObjects.getArray(targetingType);
+                    ReadableNativeArray nativeArray = (ReadableNativeArray)keywords;
+                    ArrayList<Object> list = nativeArray.toArrayList();
+                    view.setKeywords(list.toArray(new String[list.size()]));
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CONTENTURL))) {
+                    view.hasTargeting = true;
+                    String contentURL = targetingObjects.getString(targetingType);
+                    view.setContentURL(contentURL);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.PUBLISHERPROVIDEDID))) {
+                    view.hasTargeting = true;
+                    String publisherProvidedID = targetingObjects.getString(targetingType);
+                    view.setPublisherProvidedID(publisherProvidedID);
+                }
+
+                if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.LOCATION))) {
+                    view.hasTargeting = true;
+                    ReadableMap locationObject = targetingObjects.getMap(targetingType);
+                    Location location = getLocation(locationObject);
+                    view.setLocation(location);
+                }
+            }
+        }
     }
 
     @Override
