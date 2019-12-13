@@ -113,7 +113,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
     }
 
     @ReactProp(name = PROP_TARGETING)
-    public void setPropTargeting(final ReactPublisherAdView view, final ReadableMap targetingObjects) {
+    public void setPropTargeting(final RNNativeAdsAdView view, final ReadableMap targetingObjects) {
 
         ReadableMapKeySetIterator targetings = targetingObjects.keySetIterator();
 
