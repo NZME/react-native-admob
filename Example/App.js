@@ -12,8 +12,10 @@ import {
   AdMobInterstitial,
   AdMobRewarded,
   PublisherBanner,
-  PublisherNativeAd
+  PublisherNativeAd,
+  NativeAdsManager,
 } from 'react-native-admob';
+import NativeAdView from './NativeAdView';
 
 const BannerExample = ({ style, title, children, ...props }) => (
   <View {...props} style={[styles.example, style]}>
