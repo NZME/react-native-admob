@@ -48,34 +48,36 @@ export default (Component) => class NativeAdWrapper extends React.Component {
       });
     };
 
-    this.handleAdUpdated = () => {
-      this.state.nativeAd &&
-      this.props.onAdLoaded &&
-      this.props.onAdLoaded(this.state.nativeAd);
-    }
-
     this.handleOnAdLoaded = ({ nativeEvent }) => {
       this.setState({ nativeAd: nativeEvent });
+      this.props.onAdLoaded &&
+      this.props.onAdLoaded(nativeEvent);
     };
     this.handleOnSizeChange = ({ nativeEvent }) => {
       const { height, width } = nativeEvent;
       this.setState({ style: { width, height } });
-      console.log('handleOnSizeChange', nativeEvent);
+      this.props.handleOnSizeChange &&
+      this.props.handleOnSizeChange(nativeEvent);
     };
     this.handleOnAdFailedToLoad = ({ nativeEvent }) => {
-      console.log('handleOnAdFailedToLoad', nativeEvent);
+      this.props.handleOnAdFailedToLoad &&
+      this.props.handleOnAdFailedToLoad(nativeEvent);
     };
     this.handleOnAdOpened = ({ nativeEvent }) => {
-      console.log('handleOnAdOpened', nativeEvent);
+      this.props.handleOnAdOpened &&
+      this.props.handleOnAdOpened(nativeEvent);
     };
     this.handleOnAdClosed = ({ nativeEvent }) => {
-      console.log('handleOnAdClosed', nativeEvent);
+      this.props.handleOnAdClosed &&
+      this.props.handleOnAdClosed(nativeEvent);
     };
     this.handleOnAdLeftApplication = ({ nativeEvent }) => {
-      console.log('handleOnAdLeftApplication', nativeEvent);
+      this.props.handleOnAdLeftApplication &&
+      this.props.handleOnAdLeftApplication(nativeEvent);
     };
     this.handleOnAppEvent = ({ nativeEvent }) => {
-      console.log('handleOnAppEvent', nativeEvent);
+      this.props.handleOnAppEvent &&
+      this.props.handleOnAppEvent(nativeEvent);
     };
 
     this.handleNativeAdViewMount = (ref) => {
@@ -156,11 +158,11 @@ export default (Component) => class NativeAdWrapper extends React.Component {
         adsManager={adsManager.toJSON()}
         onAdLoaded={this.handleOnAdLoaded}
         onSizeChange={this.handleOnSizeChange}
-        // onAdFailedToLoad={this.handleOnAdFailedToLoad}
-        // onAdOpened={this.handleOnAdOpened}
-        // onAdClosed={this.handleOnAdClosed}
-        // onAdLeftApplication={this.handleOnAdLeftApplication}
-        // onAppEvent={this.handleOnAppEvent}
+        onAdFailedToLoad={this.handleOnAdFailedToLoad}
+        onAdOpened={this.handleOnAdOpened}
+        onAdClosed={this.handleOnAdClosed}
+        onAdLeftApplication={this.handleOnAdLeftApplication}
+        onAppEvent={this.handleOnAppEvent}
         >
         {this.renderAdComponent(rest)}
       </NativeAdView>
