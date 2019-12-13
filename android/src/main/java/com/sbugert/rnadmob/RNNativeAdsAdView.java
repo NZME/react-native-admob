@@ -1,6 +1,7 @@
 package com.sbugert.rnadmob;
 
 import android.view.View;
+import android.location.Location;
 
 import androidx.annotation.Nullable;
 
@@ -30,6 +31,8 @@ import com.google.android.gms.ads.formats.OnPublisherAdViewLoadedListener;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import com.sbugert.rnadmob.customClasses.CustomTargeting;
 
 public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;

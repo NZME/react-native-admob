@@ -189,6 +189,39 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
         parent.removeViewAt(index);
     }
 
+    private CustomTargeting[] getCustomTargeting(ReadableMap customTargeting) {
+        ArrayList<CustomTargeting> list = new ArrayList<CustomTargeting>();
+
+        for (
+            ReadableMapKeySetIterator it = customTargeting.keySetIterator();
+            it.hasNextKey();
+        ) {
+            String key = it.nextKey();
+            String value = customTargeting.getString(key);
+            list.add(new CustomTargeting(key, value));
+        }
+
+        CustomTargeting[] targetingList = list.toArray(new CustomTargeting[list.size()]);
+        return targetingList;
+    }
+
+    private Location getLocation(ReadableMap locationObject) {
+        if (
+            locationObject.hasKey("latitude")
+            && locationObject.hasKey("longitude")
+            && locationObject.hasKey("accuracy")
+        ) {
+            Location locationClass = new Location("");
+            locationClass.setLatitude(locationObject.getDouble("latitude"));
+            locationClass.setLongitude(locationObject.getDouble("longitude"));
+            locationClass.setAccuracy((float) locationObject.getDouble("accuracy"));
+
+            return locationClass;
+        }
+
+        return null;
+    }
+
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
