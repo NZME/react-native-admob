@@ -167,9 +167,12 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
             if (customTargeting != null && customTargeting.length > 0) {
                 for (int i = 0; i < customTargeting.length; i++) {
                     String key = customTargeting[i].key;
-                    String value = customTargeting[i].value;
-                    if (!key.isEmpty() && !value.isEmpty()) {
-                        adRequestBuilder.addCustomTargeting(key, value);
+                    if (!key.isEmpty()) {
+                        if (customTargeting[i].value != null && !customTargeting[i].value.isEmpty()) {
+                            adRequestBuilder.addCustomTargeting(key, customTargeting[i].value);
+                        } else if (customTargeting[i].values != null && !customTargeting[i].values.isEmpty()) {
+                            adRequestBuilder.addCustomTargeting(key, customTargeting[i].values);
+                        }
                     }
                 }
             }

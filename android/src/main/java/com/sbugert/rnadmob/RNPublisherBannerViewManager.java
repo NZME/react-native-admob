@@ -20,6 +20,7 @@ import java.util.Map;
 import com.sbugert.rnadmob.customClasses.CustomTargeting;
 import com.sbugert.rnadmob.enums.TargetingEnums;
 import com.sbugert.rnadmob.enums.TargetingEnums.TargetingTypes;
+import com.sbugert.rnadmob.utils.Targeting;
 
 public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublisherAdView> {
 
@@ -123,7 +124,7 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CUSTOMTARGETING))) {
                     view.hasTargeting = true;
                     ReadableMap customTargetingObject = targetingObjects.getMap(targetingType);
-                    CustomTargeting[] customTargetingArray = getCustomTargeting(customTargetingObject);
+                    CustomTargeting[] customTargetingArray = Targeting.getCustomTargeting(customTargetingObject);
                     view.setCustomTargeting(customTargetingArray);
                 }
 
@@ -158,7 +159,7 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.LOCATION))) {
                     view.hasTargeting = true;
                     ReadableMap locationObject = targetingObjects.getMap(targetingType);
-                    Location location = getLocation(locationObject);
+                    Location location = Targeting.getLocation(locationObject);
                     view.setLocation(location);
                 }
             }
@@ -188,39 +189,6 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
             default:
                 return AdSize.BANNER;
         }
-    }
-
-    private CustomTargeting[] getCustomTargeting(ReadableMap customTargeting) {
-        ArrayList<CustomTargeting> list = new ArrayList<CustomTargeting>();
-
-        for (
-            ReadableMapKeySetIterator it = customTargeting.keySetIterator();
-            it.hasNextKey();
-        ) {
-            String key = it.nextKey();
-            String value = customTargeting.getString(key);
-            list.add(new CustomTargeting(key, value));
-        }
-
-        CustomTargeting[] targetingList = list.toArray(new CustomTargeting[list.size()]);
-        return targetingList;
-    }
-
-    private Location getLocation(ReadableMap locationObject) {
-        if (
-            locationObject.hasKey("latitude")
-            && locationObject.hasKey("longitude")
-            && locationObject.hasKey("accuracy")
-        ) {
-            Location locationClass = new Location("");
-            locationClass.setLatitude(locationObject.getDouble("latitude"));
-            locationClass.setLongitude(locationObject.getDouble("longitude"));
-            locationClass.setAccuracy((float) locationObject.getDouble("accuracy"));
-
-            return locationClass;
-        }
-
-        return null;
     }
 
     @Nullable

@@ -31,6 +31,7 @@ import java.util.Map;
 import com.sbugert.rnadmob.customClasses.CustomTargeting;
 import com.sbugert.rnadmob.enums.TargetingEnums;
 import com.sbugert.rnadmob.enums.TargetingEnums.TargetingTypes;
+import com.sbugert.rnadmob.utils.Targeting;
 
 public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
@@ -124,39 +125,6 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private CustomTargeting[] getCustomTargeting(ReadableMap customTargeting) {
-        ArrayList<CustomTargeting> list = new ArrayList<CustomTargeting>();
-
-        for (
-            ReadableMapKeySetIterator it = customTargeting.keySetIterator();
-            it.hasNextKey();
-        ) {
-            String key = it.nextKey();
-            String value = customTargeting.getString(key);
-            list.add(new CustomTargeting(key, value));
-        }
-
-        CustomTargeting[] targetingList = list.toArray(new CustomTargeting[list.size()]);
-        return targetingList;
-    }
-
-    private Location getLocation(ReadableMap locationObject) {
-        if (
-            locationObject.hasKey("latitude")
-            && locationObject.hasKey("longitude")
-            && locationObject.hasKey("accuracy")
-        ) {
-            Location locationClass = new Location("");
-            locationClass.setLatitude(locationObject.getDouble("latitude"));
-            locationClass.setLongitude(locationObject.getDouble("longitude"));
-            locationClass.setAccuracy((float) locationObject.getDouble("accuracy"));
-
-            return locationClass;
-        }
-
-        return null;
-    }
-
     private void sendEvent(String eventName, @Nullable WritableMap params) {
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
@@ -190,7 +158,7 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CUSTOMTARGETING))) {
                     ReadableMap customTargetingObject = targetingObjects.getMap(targetingType);
-                    CustomTargeting[] customTargetingArray = getCustomTargeting(customTargetingObject);
+                    CustomTargeting[] customTargetingArray = Targeting.getCustomTargeting(customTargetingObject);
                     this.customTargeting = customTargetingArray;
                 }
 
@@ -220,7 +188,7 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.LOCATION))) {
                     ReadableMap locationObject = targetingObjects.getMap(targetingType);
-                    Location location = getLocation(locationObject);
+                    Location location = Targeting.getLocation(locationObject);
                     this.location = location;
                 }
             }
@@ -251,9 +219,12 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                     if (customTargeting != null && customTargeting.length > 0) {
                         for (int i = 0; i < customTargeting.length; i++) {
                             String key = customTargeting[i].key;
-                            String value = customTargeting[i].value;
-                            if (!key.isEmpty() && !value.isEmpty()) {
-                                adRequestBuilder.addCustomTargeting(key, value);
+                            if (!key.isEmpty()) {
+                                if (customTargeting[i].value != null && !customTargeting[i].value.isEmpty()) {
+                                    adRequestBuilder.addCustomTargeting(key, customTargeting[i].value);
+                                } else if (customTargeting[i].values != null && !customTargeting[i].values.isEmpty()) {
+                                    adRequestBuilder.addCustomTargeting(key, customTargeting[i].values);
+                                }
                             }
                         }
                     }

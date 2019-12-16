@@ -146,7 +146,26 @@ export default class Example extends Component {
               validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
               adUnitID="/83069739/jeff"
               targeting={{
-                customTargeting: { group: 'nzme_user_test' },
+                customTargeting:  {
+                  group: 'nzme_user_test',
+                  av: "1.0",
+                  pos: 1,
+                  pt: "homepage",
+                  subscriber: "true",
+                  arc_uuid: "b4894035-dd00-49da-8883-921387f0bb35",
+                  mb: {
+                    mb: "0433802",
+                    sa2: "132700"
+                  },
+                  location: {
+                    speed: 0,
+                    heading: 0,
+                    accuracy: 20,
+                    altitude: 0,
+                    longitude: 174.76333000000002,
+                    latitude: -36.84845833333333
+                  }
+                },
                 categoryExclusions: ['media'],
                 contentURL: 'nzmetest://',
                 publisherProvidedID: 'provider_id_nzme',
