@@ -9,6 +9,10 @@
 
 #include "RCTConvert+GADAdSize.h"
 
+static NSString *const kAdTypeBanner = @"banner";
+static NSString *const kAdTypeNative = @"native";
+static NSString *const kAdTypeTemplate = @"template";
+
 @implementation RNNativeAdsAdView
 {
     DFPBannerView *_bannerView;
@@ -16,6 +20,9 @@
     NSString *_nativeCustomTemplateAdClickableAsset;
     NSString *_adUnitID;
     NSArray *_testDevices;
+    _validAdTypes = @[kAdTypeBanner,
+                      kAdTypeNative,
+                      kAdTypeTemplate ]
 }
 
 - (void)dealloc
@@ -39,11 +46,13 @@
 
     // Loads an ad for any of app install, content, or custom native ads.
     NSMutableArray *adTypes = [[NSMutableArray alloc] init];
-    [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
-    if (_validAdSizes != nil || _adSize != nil) {
+    if ([_validAdTypes containsObject:kAdTypeNative]) {
+        [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
+    }
+    if ((_validAdSizes != nil || _adSize != nil) && [_validAdTypes containsObject:kAdTypeBanner]) {
         [adTypes addObject:kGADAdLoaderAdTypeDFPBanner];
     }
-    if (_customTemplateId != nil) {
+    if (_customTemplateId != nil && [_validAdTypes containsObject:kAdTypeTemplate]) {
         [adTypes addObject:kGADAdLoaderAdTypeNativeCustomTemplate];
     }
 
@@ -62,7 +71,7 @@
 
     DFPRequest *request = [DFPRequest request];
     request.testDevices = _testDevices;
-    
+
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
         if (customTargeting != nil) {
@@ -92,14 +101,14 @@
             [request setLocationWithLatitude:latitude longitude:longitude accuracy:accuracy];
         }
     }
-    
+
     [self.adLoader loadRequest:request];
 }
 
 - (void)reloadAd {
     DFPRequest *request = [DFPRequest request];
     request.testDevices = _testDevices;
-    
+
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
         if (customTargeting != nil) {
@@ -129,13 +138,22 @@
             [request setLocationWithLatitude:latitude longitude:longitude accuracy:accuracy];
         }
     }
-    
+
     [self.adLoader loadRequest:request];
 }
 
 - (void)setCustomTemplateId:(NSString *)customTemplateId
 {
     _customTemplateId = customTemplateId;
+}
+
+- (void)setValidAdTypes:(NSArray *)adTypes
+{
+    __block NSMutableArray *validAdTypes = [[NSMutableArray alloc] initWithCapacity:adTypes.count];
+    [adTypes enumerateObjectsUsingBlock:^(id jsonValue, NSUInteger idx, __unused BOOL *stop) {
+        [validAdTypes addObject:[RCTConvert NSString:jsonValue]];
+    }];
+    _validAdTypes = validAdTypes;
 }
 
 - (void)setAdSize:(NSString *)adSize
@@ -172,9 +190,9 @@
     NSLog(@"Received unified native ad: %@", nativeAd);
     [_bannerView removeFromSuperview];
     [_nativeAdView removeFromSuperview];
-    
+
     GADUnifiedNativeAdView *nativeAdView = [[GADUnifiedNativeAdView alloc] init];
-    
+
     _nativeAdView = nativeAdView;
     nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
     nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
@@ -183,7 +201,7 @@
     nativeAdView.nativeAd = nativeAd;
 
     [self addSubview:nativeAdView];
-    
+
     self.nativeAd = nativeAd;
 
     // Set ourselves as the ad delegate to be notified of native ad events.
@@ -195,7 +213,7 @@
 - (void)triggerAdLoadedEvent:(GADUnifiedNativeAd *)nativeAd {
     if (self.onAdLoaded) {
         NSMutableDictionary *ad = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                   @"native", @"type",
+                                   kAdTypeNative, @"type",
                                    nativeAd.headline, @"headline",
                                    nativeAd.body, @"bodyText",
                                    nativeAd.callToAction, @"callToActionText",
@@ -264,13 +282,13 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 
     if (self.onSizeChange) {
         self.onSizeChange(@{
-                            @"type": @"banner",
+                            @"type": kAdTypeBanner,
                             @"width": @(bannerView.frame.size.width),
                             @"height": @(bannerView.frame.size.height) });
     }
     if (self.onAdLoaded) {
         self.onAdLoaded(@{
-            @"type": @"banner",
+            @"type": kAdTypeBanner,
             @"gadSize": NSValueFromGADAdSize(bannerView.adSize),
         });
     }
@@ -296,7 +314,7 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 - (void)triggerCustomAdLoadedEvent:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
     if (self.onAdLoaded) {
         NSMutableDictionary *ad = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                   @"template", @"type",
+                                   kAdTypeTemplate, @"type",
                                    nil];
 
         [nativeCustomTemplateAd.availableAssetKeys enumerateObjectsUsingBlock:^(NSString *value, NSUInteger idx, __unused BOOL *stop) {
@@ -372,7 +390,7 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
             [view removeFromSuperview];
             [_nativeAdView addSubview:view];
             _nativeAdView.callToActionView = view;
-            
+
              _nativeAdView.callToActionView.userInteractionEnabled = NO;
         }];
     }

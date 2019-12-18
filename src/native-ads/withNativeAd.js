@@ -153,7 +153,9 @@ export default (Component) => class NativeAdWrapper extends React.Component {
       <NativeAdView
         style={[this.props.style, this.state.style]}
         adSize={this.props.adSize}
+        customTemplateId={this.props.customTemplateId}
         validAdSizes={this.props.validAdSizes}
+        validAdTypes={this.props.validAdTypes}
         ref={this.handleNativeAdViewMount}
         adsManager={adsManager.toJSON()}
         onAdLoaded={this.handleOnAdLoaded}
@@ -164,7 +166,6 @@ export default (Component) => class NativeAdWrapper extends React.Component {
         onAdLeftApplication={this.handleOnAdLeftApplication}
         onAppEvent={this.handleOnAppEvent}
         targeting={this.props.targeting}
-        customTemplateId={this.props.customTemplateId}
       >
         {this.renderAdComponent(rest)}
       </NativeAdView>

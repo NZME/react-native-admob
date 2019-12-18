@@ -37,6 +37,7 @@ RCT_CUSTOM_VIEW_PROPERTY(adsManager, NSString, RNNativeAdsAdView)
 }
 
 RCT_EXPORT_VIEW_PROPERTY(customTemplateId, NSString)
+RCT_EXPORT_VIEW_PROPERTY(validAdTypes, NSArray)
 RCT_EXPORT_VIEW_PROPERTY(adSize, NSString)
 RCT_EXPORT_VIEW_PROPERTY(validAdSizes, NSArray)
 RCT_EXPORT_VIEW_PROPERTY(targeting, NSDictionary)

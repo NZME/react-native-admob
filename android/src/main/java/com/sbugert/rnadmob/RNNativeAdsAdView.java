@@ -33,6 +33,7 @@ import com.google.android.gms.ads.formats.OnPublisherAdViewLoadedListener;
 import com.google.android.gms.ads.formats.NativeCustomTemplateAd.OnCustomTemplateAdLoadedListener;
 
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 import com.sbugert.rnadmob.customClasses.CustomTargeting;
@@ -40,6 +41,10 @@ import com.sbugert.rnadmob.customClasses.CustomTargeting;
 public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListener,
         LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener,
         OnPublisherAdViewLoadedListener, OnCustomTemplateAdLoadedListener {
+    public static final String AD_TYPE_BANNER = "banner";
+    public static final String AD_TYPE_NATIVE = "native";
+    public static final String AD_TYPE_TEMPLATE = "template";
+
     protected AdLoader adLoader;
     protected ReactApplicationContext applicationContext;
     protected UnifiedNativeAdView unifiedNativeAdView;
@@ -53,6 +58,8 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
     AdSize[] validAdSizes;
     AdSize adSize;
     String customTemplateId;
+    String[] validAdTypes = new String[]{AD_TYPE_BANNER, AD_TYPE_NATIVE, AD_TYPE_TEMPLATE};
+    ;
 
     // Targeting
     Boolean hasTargeting = false;
@@ -118,6 +125,8 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
                 AdSize[] adSizesArray = adSizes.toArray(new AdSize[adSizes.size()]);
 
+                List<String> validAdTypesList = Arrays.asList(validAdTypes);
+
 //                AdSize[] validAdSizes = new AdSize[]{AdSize.BANNER,
 //                        AdSize.FULL_BANNER,
 //                        AdSize.LARGE_BANNER,
@@ -127,12 +136,18 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 //                        AdSize.SMART_BANNER,
 //                        AdSize.FLUID};
 
+                Log.e("validAdTypes", validAdTypesList.toString());
                 AdLoader.Builder builder = new AdLoader.Builder(reactContext, adUnitID);
-                builder.forUnifiedNativeAd(RNNativeAdsAdView.this);
-                if (adSizesArray.length > 0) {
+                if (validAdTypesList.contains(AD_TYPE_NATIVE)) {
+                    Log.e("validAdTypes", AD_TYPE_NATIVE);
+                    builder.forUnifiedNativeAd(RNNativeAdsAdView.this);
+                }
+                if (adSizesArray.length > 0 && validAdTypesList.contains(AD_TYPE_BANNER)) {
+                    Log.e("validAdTypes", AD_TYPE_BANNER);
                     builder.forPublisherAdView(RNNativeAdsAdView.this, adSizesArray);
                 }
-                if (customTemplateId != null && !customTemplateId.isEmpty()) {
+                if (customTemplateId != null && !customTemplateId.isEmpty() && validAdTypesList.contains(AD_TYPE_TEMPLATE)) {
+                    Log.e("validAdTypes", AD_TYPE_TEMPLATE);
                     builder.forCustomTemplateAd(customTemplateId, RNNativeAdsAdView.this, null);
                 }
                 builder.withAdListener(new AdListener() {
@@ -386,7 +401,7 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
         adView.layout(left, top, left + width, top + height);
         sendOnSizeChangeEvent(adView);
         WritableMap ad = Arguments.createMap();
-        ad.putString("type", "banner");
+        ad.putString("type", AD_TYPE_BANNER);
         ad.putString("gadSize", adView.getAdSize().toString());
         sendEvent(RNPublisherBannerViewManager.EVENT_AD_LOADED, ad);
     }
@@ -412,7 +427,7 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
         }
 
         WritableMap ad = Arguments.createMap();
-        ad.putString("type", "template");
+        ad.putString("type", AD_TYPE_TEMPLATE);
         for (String assetName : nativeCustomTemplateAd.getAvailableAssetNames()) {
             if (nativeCustomTemplateAd.getText(assetName) != null) {
                 if (nativeCustomTemplateAdClickableAsset == null && nativeCustomTemplateAd.getText(assetName).length() > 0) {
@@ -441,7 +456,7 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
         }
 
         WritableMap ad = Arguments.createMap();
-        ad.putString("type", "native");
+        ad.putString("type", AD_TYPE_NATIVE);
         if (unifiedNativeAd.getHeadline() == null) {
             ad.putString("headline", null);
         } else {
@@ -546,6 +561,11 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
     public void setValidAdSizes(AdSize[] adSizes) {
         this.validAdSizes = adSizes;
+    }
+
+    public void setValidAdTypes(String[] adTypes) {
+        Log.e("validAdTypes_s", adTypes.toString());
+        this.validAdTypes = adTypes;
     }
 
     // Targeting

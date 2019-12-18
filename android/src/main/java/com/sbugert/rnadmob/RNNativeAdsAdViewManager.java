@@ -32,6 +32,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
     public static final String PROP_CUSTOM_TEMPLATE_ID = "customTemplateId";
     public static final String PROP_AD_SIZE = "adSize";
     public static final String PROP_VALID_AD_SIZES = "validAdSizes";
+    public static final String PROP_VALID_AD_TYPES = "validAdTypes";
     public static final String PROP_TARGETING = "targeting";
     public static final String EVENT_AD_LOADED = "onAdLoaded";
     public static final String EVENT_SIZE_CHANGE = "onSizeChange";
@@ -107,7 +108,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
 
     @ReactProp(name = PROP_VALID_AD_SIZES)
     public void setPropValidAdSizes(final RNNativeAdsAdView view, final ReadableArray adSizeStrings) {
-        ReadableNativeArray nativeArray = (ReadableNativeArray)adSizeStrings;
+        ReadableNativeArray nativeArray = (ReadableNativeArray) adSizeStrings;
         ArrayList<Object> list = nativeArray.toArrayList();
         String[] adSizeStringsArray = list.toArray(new String[list.size()]);
         AdSize[] adSizes = new AdSize[list.size()];
@@ -119,6 +120,15 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
         view.setValidAdSizes(adSizes);
     }
 
+    @ReactProp(name = PROP_VALID_AD_TYPES)
+    public void setPropValidAdTypes(final RNNativeAdsAdView view, final ReadableArray adTypesStrings) {
+        ReadableNativeArray nativeArray = (ReadableNativeArray) adTypesStrings;
+        ArrayList<Object> list = nativeArray.toArrayList();
+        String[] adTypesStringsArray = list.toArray(new String[list.size()]);
+
+        view.setValidAdTypes(adTypesStringsArray);
+    }
+
     @ReactProp(name = PROP_TARGETING)
     public void setPropTargeting(final RNNativeAdsAdView view, final ReadableMap targetingObjects) {
 
@@ -126,8 +136,8 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
 
         if (targetings.hasNextKey()) {
             for (
-                ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
-                it.hasNextKey();
+                    ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
+                    it.hasNextKey();
             ) {
                 String targetingType = it.nextKey();
 
@@ -141,7 +151,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CATEGORYEXCLUSIONS))) {
                     view.hasTargeting = true;
                     ReadableArray categoryExclusionsArray = targetingObjects.getArray(targetingType);
-                    ReadableNativeArray nativeArray = (ReadableNativeArray)categoryExclusionsArray;
+                    ReadableNativeArray nativeArray = (ReadableNativeArray) categoryExclusionsArray;
                     ArrayList<Object> list = nativeArray.toArrayList();
                     view.setCategoryExclusions(list.toArray(new String[list.size()]));
                 }
@@ -149,7 +159,7 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.KEYWORDS))) {
                     view.hasTargeting = true;
                     ReadableArray keywords = targetingObjects.getArray(targetingType);
-                    ReadableNativeArray nativeArray = (ReadableNativeArray)keywords;
+                    ReadableNativeArray nativeArray = (ReadableNativeArray) keywords;
                     ArrayList<Object> list = nativeArray.toArrayList();
                     view.setKeywords(list.toArray(new String[list.size()]));
                 }

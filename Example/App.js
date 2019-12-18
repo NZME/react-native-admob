@@ -35,7 +35,7 @@ export default class Example extends Component {
   }
 
   componentDidMount() {
-    AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
+   /* AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
     AdMobRewarded.setAdUnitID('/83069739/jeff');
 
     AdMobRewarded.addEventListener('rewarded', reward =>
@@ -83,20 +83,20 @@ export default class Example extends Component {
       console.log('AdMobInterstitial => adLeftApplication'),
     );
 
-    AdMobInterstitial.requestAd().catch(error => console.warn(error));
+    AdMobInterstitial.requestAd().catch(error => console.warn(error));*/
   }
 
   componentWillUnmount() {
-    AdMobRewarded.removeAllListeners();
-    AdMobInterstitial.removeAllListeners();
+    // AdMobRewarded.removeAllListeners();
+    // AdMobInterstitial.removeAllListeners();
   }
 
   showRewarded() {
-    AdMobRewarded.showAd().catch(error => console.warn(error));
+    // AdMobRewarded.showAd().catch(error => console.warn(error));
   }
 
   showInterstitial() {
-    AdMobInterstitial.showAd().catch(error => console.warn(error));
+    // AdMobInterstitial.showAd().catch(error => console.warn(error));
   }
 
   render() {
@@ -106,7 +106,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          <BannerExample title="AdMob - Basic">
+          {/*<BannerExample title="AdMob - Basic">
             <AdMobBanner
               adSize="banner"
               adUnitID="/83069739/jeff"
@@ -258,7 +258,7 @@ export default class Example extends Component {
               onPress={() => this._appNativeExample.loadBanner()}
               style={styles.button}
             />
-          </BannerExample>
+          </BannerExample>*/}
           <BannerExample
             style={{ padding: 20}}
             title="DFP - Native ad">
@@ -274,6 +274,7 @@ export default class Example extends Component {
                 adsManager={adsManager}
                 onSizeChange={(data) => console.log(data)}
                 customTemplateId="11891103"
+                validAdTypes={['banner', 'native', 'template']}
                 adSize="300x600"
                 validAdSizes={['banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard', 'smartBannerPortrait', 'smartBannerLandscape', '300x600']}
                 adUnitID="/83069739/jeff"

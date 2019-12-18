@@ -20,6 +20,7 @@
 @property(nonatomic, strong) GADUnifiedNativeAdView *nativeAdView;
 
 @property (nonatomic, copy) NSString *customTemplateId;
+@property (nonatomic, copy) NSArray *validAdTypes;
 @property (nonatomic, copy) NSString *adSize;
 @property (nonatomic, copy) NSArray *validAdSizes;
 @property (nonatomic, copy) NSDictionary *targeting;
