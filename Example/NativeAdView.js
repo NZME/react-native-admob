@@ -17,32 +17,57 @@ export class NativeAdView extends Component {
 
   render() {
     const { nativeAd } = this.state;
-    if (nativeAd?.type !== 'native') {
+    console.log(nativeAd);
+    if (!['native', 'template'].includes(nativeAd?.type)) {
       return null;
     }
+
+    let data = {};
+    if (nativeAd?.type == 'native') {
+      data.headline = nativeAd?.headline;
+      data.bodyText = nativeAd?.bodyText;
+      data.advertiserName = nativeAd?.advertiserName;
+      data.starRating = nativeAd?.starRating;
+      data.storeName = nativeAd?.storeName;
+      data.price = nativeAd?.price;
+      data.icon = nativeAd?.icon;
+      data.callToActionText = nativeAd?.callToActionText;
+      data.images = nativeAd?.images;
+    } else if (nativeAd?.type == 'template') {
+      data.headline = nativeAd?.title;
+      data.bodyText = nativeAd?.text;
+      data.advertiserName = nativeAd?.label;
+      data.starRating = nativeAd?.imptrk;
+      data.storeName = nativeAd?.headline;
+      data.price = null;
+      data.icon = nativeAd?.image;
+      data.callToActionText = null;
+      data.images = [];
+    }
+
     return (
       <View style={{ flexDirection: 'column', borderWidth: 1, position: 'relative' }}>
-        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.0)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}} />
+        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}} />
         <View style={{ flexDirection: 'row', padding: 10 }}>
           <View
             style={{ flexDirection: 'column', flex: 1 }}
           >
-            {nativeAd?.headline && (<Text style={{ fontSize: 18 }}>
-              {nativeAd.headline}
+            {data?.headline && (<Text style={{ fontSize: 18 }}>
+              {data.headline}
             </Text>)}
-            {nativeAd?.bodyText && (<Text style={{ fontSize: 10 }}>
-              {nativeAd.bodyText}
+            {data?.bodyText && (<Text style={{ fontSize: 10 }}>
+              {data.bodyText}
             </Text>)}
             <View style={{ flexDirection: 'row' }}>
-              <Text>{nativeAd?.advertiserName}</Text>
-              <Text>{nativeAd?.starRating}</Text>
-              <Text>{nativeAd?.storeName}</Text>
-              <Text>{nativeAd?.price}</Text>
+              <Text>{data?.advertiserName}</Text>
+              <Text>{data?.starRating}</Text>
+              <Text>{data?.storeName}</Text>
+              <Text>{data?.price}</Text>
             </View>
           </View>
-          {nativeAd?.icon?.uri && (<Image style={{ width: 80, height: 80 }} source={{uri: nativeAd.icon.uri}} />)}
+          {data?.icon?.uri && (<Image style={{ width: 80, height: 80 }} source={{uri: data.icon.uri}} />)}
         </View>
-        {nativeAd?.callToActionText && (<View style={{ alignItems: 'center' }}>
+        {data?.callToActionText && (<View style={{ alignItems: 'center' }}>
           <View
             ref={el => (this._triggerView = el)}>
             <Text
@@ -57,7 +82,7 @@ export class NativeAdView extends Component {
                 borderRadius: 6,
               }}
             >
-              {nativeAd.callToActionText}
+              {data.callToActionText}
             </Text>
           </View>
         </View>)}
