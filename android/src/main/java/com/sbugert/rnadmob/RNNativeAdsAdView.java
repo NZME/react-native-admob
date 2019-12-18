@@ -133,12 +133,7 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
                     builder.forPublisherAdView(RNNativeAdsAdView.this, adSizesArray);
                 }
                 if (customTemplateId != null && !customTemplateId.isEmpty()) {
-                    builder.forCustomTemplateAd(customTemplateId, RNNativeAdsAdView.this, new NativeCustomTemplateAd.OnCustomClickListener() {
-                        @Override
-                        public void onCustomClick(NativeCustomTemplateAd ad, String s) {
-                            sendEvent(RNNativeAdsAdViewManager.EVENT_AD_CLICKED, null);
-                        }
-                    });
+                    builder.forCustomTemplateAd(customTemplateId, RNNativeAdsAdView.this, null);
                 }
                 builder.withAdListener(new AdListener() {
                     @Override
