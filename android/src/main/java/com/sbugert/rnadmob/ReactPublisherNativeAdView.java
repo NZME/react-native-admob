@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.location.Location;
+
 import androidx.annotation.Nullable;
 
 import android.util.Log;
@@ -49,7 +50,9 @@ import java.util.ArrayList;
 
 import com.sbugert.rnadmob.customClasses.CustomTargeting;
 
-class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener, OnPublisherAdViewLoadedListener {
+class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListener,
+        LifecycleEventListener, UnifiedNativeAd.OnUnifiedNativeAdLoadedListener,
+        OnPublisherAdViewLoadedListener {
     protected AdLoader adLoader;
     protected UnifiedNativeAdView adView;
     protected PublisherAdView publisherAdView;
@@ -668,7 +671,7 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
                 }
             }
             if (categoryExclusions != null && categoryExclusions.length > 0) {
-                for (int i =0; i < categoryExclusions.length; i++) {
+                for (int i = 0; i < categoryExclusions.length; i++) {
                     String categoryExclusion = categoryExclusions[i];
                     if (!categoryExclusion.isEmpty()) {
                         adRequestBuilder.addCategoryExclusion(categoryExclusion);

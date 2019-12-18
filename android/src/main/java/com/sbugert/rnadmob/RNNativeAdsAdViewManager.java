@@ -29,6 +29,7 @@ import com.sbugert.rnadmob.utils.Targeting;
 
 public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView> {
     public static final String PROP_AD_MANAGER = "adsManager";
+    public static final String PROP_CUSTOM_TEMPLATE_ID = "customTemplateId";
     public static final String PROP_AD_SIZE = "adSize";
     public static final String PROP_VALID_AD_SIZES = "validAdSizes";
     public static final String PROP_TARGETING = "targeting";
@@ -91,6 +92,11 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
             builder.put(events[i], MapBuilder.of("registrationName", events[i]));
         }
         return builder.build();
+    }
+
+    @ReactProp(name = PROP_CUSTOM_TEMPLATE_ID)
+    public void setPropCustomTemplateId(final RNNativeAdsAdView view, final String customTemplateId) {
+        view.setCustomTemplateId(customTemplateId);
     }
 
     @ReactProp(name = PROP_AD_SIZE)
