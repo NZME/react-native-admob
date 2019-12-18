@@ -11,7 +11,9 @@
 
 @implementation RNNativeAdsAdView
 {
-    DFPBannerView  *_bannerView;
+    DFPBannerView *_bannerView;
+    GADNativeCustomTemplateAd *_nativeCustomTemplateAd;
+    NSString *_nativeCustomTemplateAdClickableAsset;
     NSString *_adUnitID;
     NSArray *_testDevices;
 }
@@ -40,6 +42,9 @@
     [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
     if (_validAdSizes != nil || _adSize != nil) {
         [adTypes addObject:kGADAdLoaderAdTypeDFPBanner];
+    }
+    if (_customTemplateId != nil) {
+        [adTypes addObject:kGADAdLoaderAdTypeNativeCustomTemplate];
     }
 
     GADVideoOptions *videoOptions = [[GADVideoOptions alloc] init];
@@ -128,7 +133,12 @@
     [self.adLoader loadRequest:request];
 }
 
-- (void)setadSize:(NSString *)adSize
+- (void)setCustomTemplateId:(NSString *)customTemplateId
+{
+    _customTemplateId = customTemplateId;
+}
+
+- (void)setAdSize:(NSString *)adSize
 {
     _adSize = adSize;
 }
@@ -266,6 +276,51 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
     }
 }
 
+#pragma mark GADNativeCustomTemplateAdLoaderDelegate implementation
+
+- (void)adLoader:(GADAdLoader *)adLoader
+    didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
+    NSLog(@"Received custom native ad: %@", nativeCustomTemplateAd);
+    _nativeCustomTemplateAd = nativeCustomTemplateAd;
+
+    [self triggerCustomAdLoadedEvent:nativeCustomTemplateAd];
+
+    [nativeCustomTemplateAd recordImpression];
+}
+
+- (NSArray *)nativeCustomTemplateIDsForAdLoader:(GADAdLoader *)adLoader {
+    return @[ _customTemplateId ];
+}
+
+
+- (void)triggerCustomAdLoadedEvent:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
+    if (self.onAdLoaded) {
+        NSMutableDictionary *ad = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                   @"template", @"type",
+                                   nil];
+
+        [nativeCustomTemplateAd.availableAssetKeys enumerateObjectsUsingBlock:^(NSString *value, NSUInteger idx, __unused BOOL *stop) {
+            if ([nativeCustomTemplateAd stringForKey:value] != nil) {
+                NSString *assetVal = [nativeCustomTemplateAd stringForKey:value];
+                if (_nativeCustomTemplateAdClickableAsset == nil && assetVal.length > 2) {
+                    _nativeCustomTemplateAdClickableAsset = value;
+                }
+                ad[value] = assetVal;
+            } else if ([nativeCustomTemplateAd imageForKey:value] != nil) {
+                GADNativeAdImage *image = [nativeCustomTemplateAd imageForKey:value];
+                ad[value] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                             image.imageURL.absoluteString, @"uri",
+                             [[NSNumber numberWithFloat:image.image.size.width] stringValue], @"width",
+                             [[NSNumber numberWithFloat:image.image.size.height] stringValue], @"height",
+                             [[NSNumber numberWithFloat:image.scale] stringValue], @"scale",
+                             nil];
+            }
+        }];
+
+        self.onAdLoaded(ad);
+    }
+}
+
 #pragma mark GADVideoControllerDelegate implementation
 
 - (void)videoControllerDidEndVideoPlayback:(GADVideoController *)videoController {
@@ -305,7 +360,14 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 }
 
 - (void)registerViewsForInteraction:(NSArray<UIView *> *)clickableViews {
-    if (_nativeAdView != nil) {
+    if (_nativeCustomTemplateAd != nil && _nativeCustomTemplateAdClickableAsset != nil) {
+        [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
+            [view addGestureRecognizer:[[UITapGestureRecognizer alloc]
+                                        initWithTarget:self
+                                        action:@selector(performClickOnCustomAd)]];
+            view.userInteractionEnabled = YES;
+        }];
+    } else if (_nativeAdView != nil) {
         [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
             [view removeFromSuperview];
             [_nativeAdView addSubview:view];
@@ -313,6 +375,12 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
             
              _nativeAdView.callToActionView.userInteractionEnabled = NO;
         }];
+    }
+}
+
+- (void)performClickOnCustomAd {
+    if (_nativeCustomTemplateAd != nil) {
+        [_nativeCustomTemplateAd performClickOnAssetWithKey:_nativeCustomTemplateAdClickableAsset];
     }
 }
 

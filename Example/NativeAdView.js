@@ -47,7 +47,7 @@ export class NativeAdView extends Component {
 
     return (
       <View style={{ flexDirection: 'column', borderWidth: 1, position: 'relative' }}>
-        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', top:0, left:0, width: '100%', height: '100%'}} />
+        <TriggerableView style={{backgroundColor: 'rgba(52, 52, 52, 0.5)', position: 'absolute', zIndex:99, top:0, left:0, width: '100%', height: '100%'}} />
         <View style={{ flexDirection: 'row', padding: 10 }}>
           <View
             style={{ flexDirection: 'column', flex: 1 }}
