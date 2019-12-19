@@ -20,9 +20,6 @@ static NSString *const kAdTypeTemplate = @"template";
     NSString *_nativeCustomTemplateAdClickableAsset;
     NSString *_adUnitID;
     NSArray *_testDevices;
-    _validAdTypes = @[kAdTypeBanner,
-                      kAdTypeNative,
-                      kAdTypeTemplate ]
 }
 
 - (void)dealloc
@@ -43,6 +40,14 @@ static NSString *const kAdTypeTemplate = @"template";
 - (void)loadAd:(RNNativeAdsManager *)adManager {
     _adUnitID = adManager.adUnitID;
     _testDevices = adManager.testDevices;
+
+    if (_validAdTypes == nil) {
+        _validAdTypes = @[
+            kAdTypeBanner,
+            kAdTypeNative,
+            kAdTypeTemplate
+        ];
+    }
 
     // Loads an ad for any of app install, content, or custom native ads.
     NSMutableArray *adTypes = [[NSMutableArray alloc] init];
