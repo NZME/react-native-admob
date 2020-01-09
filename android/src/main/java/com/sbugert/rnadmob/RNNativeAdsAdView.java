@@ -603,10 +603,28 @@ public class RNNativeAdsAdView extends ReactViewGroup implements AppEventListene
 
     @Override
     public void onHostResume() {
+        if (this.unifiedNativeAdView != null) {
+            this.unifiedNativeAdView.resume();
+        }
+        if (this.publisherAdView != null) {
+            this.publisherAdView.resume();
+        }
+        if (this.nativeCustomTemplateAd != null) {
+            this.nativeCustomTemplateAd.resume();
+        }
     }
 
     @Override
     public void onHostPause() {
+        if (this.unifiedNativeAdView != null) {
+            this.unifiedNativeAdView.pause();
+        }
+        if (this.publisherAdView != null) {
+            this.publisherAdView.pause();
+        }
+        if (this.nativeCustomTemplateAd != null) {
+            this.nativeCustomTemplateAd.pause();
+        }
     }
 
     @Override

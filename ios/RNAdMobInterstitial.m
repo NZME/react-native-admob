@@ -80,7 +80,7 @@ RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
 
         DFPRequest *request = [DFPRequest request];
         request.testDevices = _testDevices;
-        
+
         if (_targeting != nil) {
             NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
             if (customTargeting != nil) {
@@ -110,7 +110,7 @@ RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
                 [request setLocationWithLatitude:latitude longitude:longitude accuracy:accuracy];
             }
         }
-        
+
         [_interstitial loadRequest:request];
     } else {
         reject(@"E_AD_ALREADY_LOADED", @"Ad is already loaded.", nil);
@@ -160,6 +160,7 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
         [self sendEventWithName:kEventAdFailedToLoad body:jsError];
     }
     _requestAdReject(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
+    _interstitial = nil;
 }
 
 - (void)interstitialWillPresentScreen:(__unused GADInterstitial *)ad
