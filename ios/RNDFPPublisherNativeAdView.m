@@ -55,9 +55,9 @@
 
     self.adLoader.delegate = self;
 
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
-    request.testDevices = _testDevices;
-    
+
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
         if (customTargeting != nil) {

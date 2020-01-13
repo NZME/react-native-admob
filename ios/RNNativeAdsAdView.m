@@ -80,8 +80,9 @@ static NSString *const kAdTypeTemplate = @"template";
 
     _adLoader.delegate = self;
 
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
-    request.testDevices = _testDevices;
+
 
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
@@ -121,9 +122,9 @@ static NSString *const kAdTypeTemplate = @"template";
         return;
     }
 
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
     request.testDevices = _testDevices;
-
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
         if (customTargeting != nil) {
@@ -197,11 +198,17 @@ static NSString *const kAdTypeTemplate = @"template";
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
     }
-    _nativeAd = nil;
     _nativeAdView = nil;
     _bannerView = nil;
     _nativeCustomTemplateAd = nil;
-    _adLoader = nil;
+    if (_adLoader != nil) {
+        _adLoader.delegate = nil;
+        _adLoader = nil;
+    }
+    if (_nativeAd != nil) {
+        _nativeAd.delegate = nil;
+        _nativeAd = nil;
+    }
 }
 
 #pragma mark GADUnifiedNativeAdLoaderDelegate implementation
@@ -226,7 +233,12 @@ static NSString *const kAdTypeTemplate = @"template";
 
     [self triggerAdLoadedEvent:_nativeAd];
 
-    _adLoader = nil;
+    _bannerView = nil;
+    _nativeCustomTemplateAd = nil;
+    if (_adLoader != nil) {
+        _adLoader.delegate = nil;
+        _adLoader = nil;
+    }
 }
 
 - (void)triggerAdLoadedEvent:(GADUnifiedNativeAd *)nativeAd {
@@ -311,7 +323,16 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
         });
     }
 
-    _adLoader = nil;
+    _nativeAdView = nil;
+    _nativeCustomTemplateAd = nil;
+    if (_adLoader != nil) {
+        _adLoader.delegate = nil;
+        _adLoader = nil;
+    }
+    if (_nativeAd != nil) {
+        _nativeAd.delegate = nil;
+        _nativeAd = nil;
+    }
 }
 
 #pragma mark GADNativeCustomTemplateAdLoaderDelegate implementation
@@ -327,7 +348,16 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 
     [_nativeCustomTemplateAd recordImpression];
 
-    _adLoader = nil;
+    _nativeAdView = nil;
+    _bannerView = nil;
+    if (_adLoader != nil) {
+        _adLoader.delegate = nil;
+        _adLoader = nil;
+    }
+    if (_nativeAd != nil) {
+        _nativeAd.delegate = nil;
+        _nativeAd = nil;
+    }
 }
 
 - (NSArray *)nativeCustomTemplateIDsForAdLoader:(GADAdLoader *)adLoader {
@@ -364,19 +394,19 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 
 #pragma mark GADVideoControllerDelegate implementation
 
-- (void)videoControllerDidEndVideoPlayback:(GADVideoController *)videoController {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-}
+//- (void)videoControllerDidEndVideoPlayback:(GADVideoController *)videoController {
+//    NSLog(@"%s", __PRETTY_FUNCTION__);
+//}
 
 #pragma mark GADUnifiedNativeAdDelegate
 
-- (void)nativeAdDidRecordClick:(GADUnifiedNativeAd *)nativeAd {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-}
-
-- (void)nativeAdDidRecordImpression:(GADUnifiedNativeAd *)nativeAd {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-}
+//- (void)nativeAdDidRecordClick:(GADUnifiedNativeAd *)nativeAd {
+//    NSLog(@"%s", __PRETTY_FUNCTION__);
+//}
+//
+//- (void)nativeAdDidRecordImpression:(GADUnifiedNativeAd *)nativeAd {
+//    NSLog(@"%s", __PRETTY_FUNCTION__);
+//}
 
 - (void)nativeAdWillPresentScreen:(GADUnifiedNativeAd *)nativeAd {
     if (self.onAdOpened) {
@@ -384,9 +414,9 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
     }
 }
 
-- (void)nativeAdWillDismissScreen:(GADUnifiedNativeAd *)nativeAd {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-}
+//- (void)nativeAdWillDismissScreen:(GADUnifiedNativeAd *)nativeAd {
+//    NSLog(@"%s", __PRETTY_FUNCTION__);
+//}
 
 - (void)nativeAdDidDismissScreen:(GADUnifiedNativeAd *)nativeAd {
     if (self.onAdClosed) {

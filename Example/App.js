@@ -75,25 +75,44 @@ export default class Example extends Component {
     // console.log(nativeAd);
   };
 
-  showBanner = () => {
+  showBanner = adsManager => {
     return <BannerExample title="DFP - Fluid Ad Size">
       <View
         style={[
           { backgroundColor: '#f3f', paddingVertical: 10 },
           {alignItems: 'center', width: '100%'}
         ]}>
-        <PublisherBanner
-          onAdLoaded={this.onAdLoaded}
-          adSize="mediumRectangle"
-          validAdSizes={['mediumRectangle']}
-          adUnitID={'/83069739/jeff'}
+        <NativeAdView
           targeting={{
             customTargeting: { group: 'nzme_user_test' },
             categoryExclusions: ['media'],
             contentURL: 'nzmetest://',
             publisherProvidedID: 'provider_id_nzme',
           }}
+          // style={{ width: '100%'}}
+          adsManager={adsManager}
+          // adLayout={'horizontal'}
+          validAdTypes={['banner']}
+          adSize="mediumRectangle"
+          validAdSizes={['mediumRectangle']}
+          onAdLoaded={this.onAdLoaded}
+          adUnitID={'/83069739/jeff'}
+          onAdFailedToLoad={error => {
+            console.log(error);
+          }}
         />
+        {/*<PublisherBanner*/}
+        {/*  onAdLoaded={this.onAdLoaded}*/}
+        {/*  adSize="mediumRectangle"*/}
+        {/*  validAdSizes={['mediumRectangle']}*/}
+        {/*  adUnitID={'/83069739/jeff'}*/}
+        {/*  targeting={{*/}
+        {/*    customTargeting: { group: 'nzme_user_test' },*/}
+        {/*    categoryExclusions: ['media'],*/}
+        {/*    contentURL: 'nzmetest://',*/}
+        {/*    publisherProvidedID: 'provider_id_nzme',*/}
+        {/*  }}*/}
+        {/*/>*/}
       </View>
     </BannerExample>;
   };
@@ -129,38 +148,14 @@ export default class Example extends Component {
     // const adsManager = new NativeAdsManager("/6499/example/native", [AdMobInterstitial.simulatorId]);
     const adsManager = new NativeAdsManager("/83069739/jeff", [AdMobInterstitial.simulatorId]);
     const adsList = [
-      // {type: 'banner'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
+      {type: 'banner'},
       {type: 'native'},
       {type: 'native'},
       {type: 'native'},
       {type: 'native'},
       {type: 'native'},
     ];
-    console.log('test');
+
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -172,7 +167,7 @@ export default class Example extends Component {
           </BannerExample>
           {adsList?.map((curItem, index) => {
             if (curItem.type === 'banner') {
-              return <View key={index}>{this.showBanner()}</View>;
+              return <View key={index}>{this.showBanner(adsManager)}</View>;
             } else {
               return <View key={index}>{this.showNative(adsManager)}</View>;
             }

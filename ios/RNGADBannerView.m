@@ -57,8 +57,8 @@
                                 });
         }
     }
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     GADRequest *request = [GADRequest request];
-    request.testDevices = _testDevices;
     [_bannerView loadRequest:request];
 }
 

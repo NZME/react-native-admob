@@ -68,8 +68,8 @@ RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
     _requestAdReject = reject;
 
     [GADRewardBasedVideoAd sharedInstance].delegate = self;
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     GADRequest *request = [GADRequest request];
-    request.testDevices = _testDevices;
     [[GADRewardBasedVideoAd sharedInstance] loadRequest:request
                                            withAdUnitID:_adUnitID];
 }

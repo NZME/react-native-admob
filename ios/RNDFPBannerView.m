@@ -54,8 +54,8 @@
 #pragma clang diagnostic pop
 
 - (void)loadBanner {
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
-    request.testDevices = _testDevices;
 
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];

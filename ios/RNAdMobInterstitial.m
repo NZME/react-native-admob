@@ -78,8 +78,8 @@ RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
         _interstitial = [[GADInterstitial alloc] initWithAdUnitID:_adUnitID];
         _interstitial.delegate = self;
 
+        GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
         DFPRequest *request = [DFPRequest request];
-        request.testDevices = _testDevices;
 
         if (_targeting != nil) {
             NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
