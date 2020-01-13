@@ -1,6 +1,7 @@
 package com.sbugert.rnadmob;
 
 import androidx.annotation.Nullable;
+
 import android.location.Location;
 import android.view.View;
 
@@ -95,7 +96,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
 
     @ReactProp(name = PROP_VALID_AD_SIZES)
     public void setPropValidAdSizes(final ReactPublisherNativeAdView view, final ReadableArray adSizeStrings) {
-        ReadableNativeArray nativeArray = (ReadableNativeArray)adSizeStrings;
+        ReadableNativeArray nativeArray = (ReadableNativeArray) adSizeStrings;
         ArrayList<Object> list = nativeArray.toArrayList();
         String[] adSizeStringsArray = list.toArray(new String[list.size()]);
         AdSize[] adSizes = new AdSize[list.size()];
@@ -119,7 +120,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
 
     @ReactProp(name = PROP_TEST_DEVICES)
     public void setPropTestDevices(final ReactPublisherNativeAdView view, final ReadableArray testDevices) {
-        ReadableNativeArray nativeArray = (ReadableNativeArray)testDevices;
+        ReadableNativeArray nativeArray = (ReadableNativeArray) testDevices;
         ArrayList<Object> list = nativeArray.toArrayList();
         view.setTestDevices(list.toArray(new String[list.size()]));
     }
@@ -131,8 +132,8 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
 
         if (targetings.hasNextKey()) {
             for (
-                ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
-                it.hasNextKey();
+                    ReadableMapKeySetIterator it = targetingObjects.keySetIterator();
+                    it.hasNextKey();
             ) {
                 String targetingType = it.nextKey();
 
@@ -146,7 +147,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.CATEGORYEXCLUSIONS))) {
                     view.hasTargeting = true;
                     ReadableArray categoryExclusionsArray = targetingObjects.getArray(targetingType);
-                    ReadableNativeArray nativeArray = (ReadableNativeArray)categoryExclusionsArray;
+                    ReadableNativeArray nativeArray = (ReadableNativeArray) categoryExclusionsArray;
                     ArrayList<Object> list = nativeArray.toArrayList();
                     view.setCategoryExclusions(list.toArray(new String[list.size()]));
                 }
@@ -154,7 +155,7 @@ public class RNPublisherNativeAdViewManager extends ViewGroupManager<ReactPublis
                 if (targetingType.equals(TargetingEnums.getEnumString(TargetingTypes.KEYWORDS))) {
                     view.hasTargeting = true;
                     ReadableArray keywords = targetingObjects.getArray(targetingType);
-                    ReadableNativeArray nativeArray = (ReadableNativeArray)keywords;
+                    ReadableNativeArray nativeArray = (ReadableNativeArray) keywords;
                     ArrayList<Object> list = nativeArray.toArrayList();
                     view.setKeywords(list.toArray(new String[list.size()]));
                 }

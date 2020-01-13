@@ -2,11 +2,14 @@ package com.sbugert.rnadmob;
 
 import android.content.Context;
 import android.location.Location;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.view.ReactViewGroup;
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 
 import com.sbugert.rnadmob.customClasses.CustomTargeting;
 
-class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
+class ReactPublisherAdView extends ReactViewGroup implements AppEventListener, LifecycleEventListener {
 
     protected PublisherAdView adView;
 
@@ -39,8 +42,9 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     String publisherProvidedID;
     Location location;
 
-    public ReactPublisherAdView(final Context context) {
+    public ReactPublisherAdView(final Context context, ReactApplicationContext applicationContext) {
         super(context);
+        applicationContext.addLifecycleEventListener(this);
         this.createAdView();
     }
 
@@ -177,7 +181,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
                 }
             }
             if (categoryExclusions != null && categoryExclusions.length > 0) {
-                for (int i =0; i < categoryExclusions.length; i++) {
+                for (int i = 0; i < categoryExclusions.length; i++) {
                     String categoryExclusion = categoryExclusions[i];
                     if (!categoryExclusion.isEmpty()) {
                         adRequestBuilder.addCategoryExclusion(categoryExclusion);
@@ -245,7 +249,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     public void setLocation(Location location) {
         this.location = location;
     }
-    
+
     public void setAdSize(AdSize adSize) {
         this.adSize = adSize;
     }
@@ -260,5 +264,26 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         event.putString("name", name);
         event.putString("info", info);
         sendEvent(RNPublisherBannerViewManager.EVENT_APP_EVENT, event);
+    }
+
+    @Override
+    public void onHostResume() {
+        if (this.adView != null) {
+            this.adView.resume();
+        }
+    }
+
+    @Override
+    public void onHostPause() {
+        if (this.adView != null) {
+            this.adView.pause();
+        }
+    }
+
+    @Override
+    public void onHostDestroy() {
+        if (this.adView != null) {
+            this.adView.destroy();
+        }
     }
 }

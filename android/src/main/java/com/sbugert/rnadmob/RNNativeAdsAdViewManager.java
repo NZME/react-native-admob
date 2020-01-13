@@ -57,6 +57,20 @@ public class RNNativeAdsAdViewManager extends ViewGroupManager<RNNativeAdsAdView
     }
 
     @Override
+    public void onDropViewInstance(RNNativeAdsAdView view) {
+        if (view.unifiedNativeAdView != null) {
+            view.unifiedNativeAdView.destroy();
+        }
+        if (view.publisherAdView != null) {
+            view.publisherAdView.destroy();
+        }
+        if (view.nativeCustomTemplateAd != null) {
+            view.nativeCustomTemplateAd.destroy();
+        }
+        super.onDropViewInstance(view);
+    }
+
+    @Override
     protected RNNativeAdsAdView createViewInstance(ThemedReactContext reactContext) {
         return new RNNativeAdsAdView(reactContext, applicationContext);
     }

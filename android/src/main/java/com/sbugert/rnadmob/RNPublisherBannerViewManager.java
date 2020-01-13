@@ -12,6 +12,7 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.google.android.gms.ads.AdSize;
 
 import java.util.ArrayList;
@@ -47,9 +48,26 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
         return REACT_CLASS;
     }
 
+    private ReactApplicationContext applicationContext;
+
+    public RNPublisherBannerViewManager(ReactApplicationContext context) {
+        super();
+        this.applicationContext = context;
+    }
+
+    @Override
+    public void onDropViewInstance(ReactPublisherAdView view) {
+        if (view.adView != null) {
+            view.adView.setAppEventListener(null);
+            view.adView.setAdListener(null);
+            view.adView.destroy();
+        }
+        super.onDropViewInstance(view);
+    }
+
     @Override
     protected ReactPublisherAdView createViewInstance(ThemedReactContext themedReactContext) {
-        ReactPublisherAdView adView = new ReactPublisherAdView(themedReactContext);
+        ReactPublisherAdView adView = new ReactPublisherAdView(themedReactContext, applicationContext);
         return adView;
     }
 

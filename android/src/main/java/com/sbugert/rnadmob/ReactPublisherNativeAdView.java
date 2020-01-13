@@ -761,10 +761,16 @@ class ReactPublisherNativeAdView extends ReactViewGroup implements AppEventListe
 
     @Override
     public void onHostResume() {
+        if (this.publisherAdView != null) {
+            this.publisherAdView.resume();
+        }
     }
 
     @Override
     public void onHostPause() {
+        if (this.publisherAdView != null) {
+            this.publisherAdView.pause();
+        }
     }
 
     @Override
