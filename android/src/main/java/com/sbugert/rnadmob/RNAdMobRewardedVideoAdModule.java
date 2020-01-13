@@ -2,6 +2,7 @@ package com.sbugert.rnadmob;
 
 import android.os.Handler;
 import android.os.Looper;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -64,8 +65,8 @@ public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule imp
     public void onRewardedVideoAdLoaded() {
         sendEvent(EVENT_AD_LOADED, null);
         if (mRequestAdPromise != null) {
-          mRequestAdPromise.resolve(null);
-          mRequestAdPromise = null;
+            mRequestAdPromise.resolve(null);
+            mRequestAdPromise = null;
         }
     }
 
@@ -100,29 +101,29 @@ public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule imp
         String errorMessage = "Unknown error";
         switch (errorCode) {
             case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-              errorString = "ERROR_CODE_INTERNAL_ERROR";
-              errorMessage = "Internal error, an invalid response was received from the ad server.";
-              break;
+                errorString = "ERROR_CODE_INTERNAL_ERROR";
+                errorMessage = "Internal error, an invalid response was received from the ad server.";
+                break;
             case AdRequest.ERROR_CODE_INVALID_REQUEST:
-              errorString = "ERROR_CODE_INVALID_REQUEST";
-              errorMessage = "Invalid ad request, possibly an incorrect ad unit ID was given.";
-              break;
+                errorString = "ERROR_CODE_INVALID_REQUEST";
+                errorMessage = "Invalid ad request, possibly an incorrect ad unit ID was given.";
+                break;
             case AdRequest.ERROR_CODE_NETWORK_ERROR:
-              errorString = "ERROR_CODE_NETWORK_ERROR";
-              errorMessage = "The ad request was unsuccessful due to network connectivity.";
-              break;
+                errorString = "ERROR_CODE_NETWORK_ERROR";
+                errorMessage = "The ad request was unsuccessful due to network connectivity.";
+                break;
             case AdRequest.ERROR_CODE_NO_FILL:
-              errorString = "ERROR_CODE_NO_FILL";
-              errorMessage = "The ad request was successful, but no ad was returned due to lack of ad inventory.";
-              break;
+                errorString = "ERROR_CODE_NO_FILL";
+                errorMessage = "The ad request was successful, but no ad was returned due to lack of ad inventory.";
+                break;
         }
         WritableMap event = Arguments.createMap();
         WritableMap error = Arguments.createMap();
         event.putString("message", errorMessage);
         sendEvent(EVENT_AD_FAILED_TO_LOAD, event);
         if (mRequestAdPromise != null) {
-          mRequestAdPromise.reject(errorString, errorMessage);
-          mRequestAdPromise = null;
+            mRequestAdPromise.reject(errorString, errorMessage);
+            mRequestAdPromise = null;
         }
     }
 
@@ -137,9 +138,9 @@ public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule imp
 
     @ReactMethod
     public void setTestDevices(ReadableArray testDevices) {
-      ReadableNativeArray nativeArray = (ReadableNativeArray)testDevices;
-      ArrayList<Object> list = nativeArray.toArrayList();
-      this.testDevices = list.toArray(new String[list.size()]);
+        ReadableNativeArray nativeArray = (ReadableNativeArray) testDevices;
+        ArrayList<Object> list = nativeArray.toArrayList();
+        this.testDevices = list.toArray(new String[list.size()]);
     }
 
     @ReactMethod

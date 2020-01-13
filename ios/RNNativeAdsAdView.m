@@ -124,7 +124,7 @@ static NSString *const kAdTypeTemplate = @"template";
 
     GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
-    request.testDevices = _testDevices;
+
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
         if (customTargeting != nil) {
@@ -222,7 +222,7 @@ static NSString *const kAdTypeTemplate = @"template";
     _nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
     _nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
     _nativeAdView.clipsToBounds = YES;
-    
+
     _nativeAd = nativeAd;
     _nativeAdView.nativeAd = _nativeAd;
 

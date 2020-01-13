@@ -2,19 +2,20 @@ package com.sbugert.rnadmob;
 
 import android.content.Context;
 import android.location.Location;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
@@ -179,7 +180,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener, L
                 }
             }
             if (categoryExclusions != null && categoryExclusions.length > 0) {
-                for (int i =0; i < categoryExclusions.length; i++) {
+                for (int i = 0; i < categoryExclusions.length; i++) {
                     String categoryExclusion = categoryExclusions[i];
                     if (!categoryExclusion.isEmpty()) {
                         adRequestBuilder.addCategoryExclusion(categoryExclusion);

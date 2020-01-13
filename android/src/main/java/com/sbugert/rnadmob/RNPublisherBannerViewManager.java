@@ -57,12 +57,12 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
 
     @Override
     public void onDropViewInstance(ReactPublisherAdView view) {
-        if (view.adView) {
+        if (view.adView != null) {
             view.adView.setAppEventListener(null);
             view.adView.setAdListener(null);
             view.adView.destroy();
-            super.onDropViewInstance(view);
         }
+        super.onDropViewInstance(view);
     }
 
     @Override
