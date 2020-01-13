@@ -94,10 +94,13 @@ export default (Component) => class NativeAdWrapper extends React.Component {
       style: {},
     };
   }
-  /**
-   * On init, register for updates on `adsManager` to know when it becomes available
-   */
-  componentDidMount() {
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (Object.entries(this.state).toString() === Object.entries(nextState).toString()
+      && Object.entries(this.props).toString() === Object.entries(nextProps).toString()) {
+      return false;
+    }
+    return true;
   }
 
   componentDidUpdate(_, prevState) {
@@ -117,11 +120,6 @@ export default (Component) => class NativeAdWrapper extends React.Component {
           // do nothing for now
         });
     }
-  }
-  /**
-   * Clear subscription when component goes off screen
-   */
-  componentWillUnmount() {
   }
 
   reloadAd() {

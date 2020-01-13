@@ -15,6 +15,12 @@ static NSString *const kAdTypeTemplate = @"template";
 
 @implementation RNNativeAdsAdView
 {
+    /// You must keep a strong reference to the GADAdLoader during the ad loading process.
+    GADAdLoader *_adLoader;
+    /// The native ad that is being loaded.
+    GADUnifiedNativeAd *_nativeAd;
+    /// The native ad view that is being presented.
+    GADUnifiedNativeAdView *_nativeAdView;
     DFPBannerView *_bannerView;
     GADNativeCustomTemplateAd *_nativeCustomTemplateAd;
     NSString *_nativeCustomTemplateAdClickableAsset;
@@ -67,12 +73,12 @@ static NSString *const kAdTypeTemplate = @"template";
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIViewController *rootViewController = [keyWindow rootViewController];
 
-    self.adLoader = [[GADAdLoader alloc] initWithAdUnitID:_adUnitID
+    _adLoader = [[GADAdLoader alloc] initWithAdUnitID:_adUnitID
                                        rootViewController:rootViewController
                                                   adTypes:adTypes
                                                   options:@[ videoOptions ]];
 
-    self.adLoader.delegate = self;
+    _adLoader.delegate = self;
 
     DFPRequest *request = [DFPRequest request];
     request.testDevices = _testDevices;
@@ -107,10 +113,14 @@ static NSString *const kAdTypeTemplate = @"template";
         }
     }
 
-    [self.adLoader loadRequest:request];
+    [_adLoader loadRequest:request];
 }
 
 - (void)reloadAd {
+    if (_adLoader == nil) {
+        return;
+    }
+
     DFPRequest *request = [DFPRequest request];
     request.testDevices = _testDevices;
 
@@ -144,7 +154,7 @@ static NSString *const kAdTypeTemplate = @"template";
         }
     }
 
-    [self.adLoader loadRequest:request];
+    [_adLoader loadRequest:request];
 }
 
 - (void)setCustomTemplateId:(NSString *)customTemplateId
@@ -187,32 +197,36 @@ static NSString *const kAdTypeTemplate = @"template";
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
     }
+    _nativeAd = nil;
+    _nativeAdView = nil;
+    _bannerView = nil;
+    _nativeCustomTemplateAd = nil;
+    _adLoader = nil;
 }
 
 #pragma mark GADUnifiedNativeAdLoaderDelegate implementation
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveUnifiedNativeAd:(GADUnifiedNativeAd *)nativeAd {
-    NSLog(@"Received unified native ad: %@", nativeAd);
     [_bannerView removeFromSuperview];
     [_nativeAdView removeFromSuperview];
 
-    GADUnifiedNativeAdView *nativeAdView = [[GADUnifiedNativeAdView alloc] init];
+    _nativeAdView = [[GADUnifiedNativeAdView alloc] init];
 
-    _nativeAdView = nativeAdView;
-    nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
-    nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
-    nativeAdView.clipsToBounds = YES;
+    _nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
+    _nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
+    _nativeAdView.clipsToBounds = YES;
+    
+    _nativeAd = nativeAd;
+    _nativeAdView.nativeAd = _nativeAd;
 
-    nativeAdView.nativeAd = nativeAd;
-
-    [self addSubview:nativeAdView];
-
-    self.nativeAd = nativeAd;
+    [self addSubview:_nativeAdView];
 
     // Set ourselves as the ad delegate to be notified of native ad events.
-    nativeAd.delegate = self;
+    _nativeAd.delegate = self;
 
-    [self triggerAdLoadedEvent:nativeAd];
+    [self triggerAdLoadedEvent:_nativeAd];
+
+    _adLoader = nil;
 }
 
 - (void)triggerAdLoadedEvent:(GADUnifiedNativeAd *)nativeAd {
@@ -274,7 +288,6 @@ static NSString *const kAdTypeTemplate = @"template";
 
 - (void)adLoader:(nonnull GADAdLoader *)adLoader
 didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
-    NSLog(@"banner is Loaded: %@", bannerView);
     [_bannerView removeFromSuperview];
     [_nativeAdView removeFromSuperview];
     _bannerView = bannerView;
@@ -297,24 +310,29 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
             @"gadSize": NSValueFromGADAdSize(bannerView.adSize),
         });
     }
+
+    _adLoader = nil;
 }
 
 #pragma mark GADNativeCustomTemplateAdLoaderDelegate implementation
 
 - (void)adLoader:(GADAdLoader *)adLoader
     didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
-    NSLog(@"Received custom native ad: %@", nativeCustomTemplateAd);
+    [_bannerView removeFromSuperview];
+    [_nativeAdView removeFromSuperview];
+
     _nativeCustomTemplateAd = nativeCustomTemplateAd;
 
-    [self triggerCustomAdLoadedEvent:nativeCustomTemplateAd];
+    [self triggerCustomAdLoadedEvent:_nativeCustomTemplateAd];
 
-    [nativeCustomTemplateAd recordImpression];
+    [_nativeCustomTemplateAd recordImpression];
+
+    _adLoader = nil;
 }
 
 - (NSArray *)nativeCustomTemplateIDsForAdLoader:(GADAdLoader *)adLoader {
     return @[ _customTemplateId ];
 }
-
 
 - (void)triggerCustomAdLoadedEvent:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
     if (self.onAdLoaded) {
@@ -393,10 +411,9 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
     } else if (_nativeAdView != nil) {
         [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
             [view removeFromSuperview];
+            view.userInteractionEnabled = NO;
             [_nativeAdView addSubview:view];
             _nativeAdView.callToActionView = view;
-
-             _nativeAdView.callToActionView.userInteractionEnabled = NO;
         }];
     }
 }
@@ -413,9 +430,9 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 {
     if (_nativeAdView != nil) {
         [subview removeFromSuperview];
+        subview.userInteractionEnabled = NO;
         [_nativeAdView addSubview:subview];
         _nativeAdView.callToActionView = subview;
-        _nativeAdView.callToActionView.userInteractionEnabled = NO;
     } else {
         [super insertReactSubview:subview atIndex:atIndex];
     }

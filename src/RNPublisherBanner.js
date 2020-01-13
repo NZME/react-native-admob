@@ -29,6 +29,14 @@ class PublisherBanner extends Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (Object.entries(this.state.style).toString() === Object.entries(nextState.style).toString()
+    && Object.entries(this.props).toString() === Object.entries(nextProps).toString()) {
+      return false;
+    }
+    return true;
+  }
+
   componentDidMount() {
     this.loadBanner();
   }

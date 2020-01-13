@@ -16,6 +16,7 @@
 @implementation RNDFPBannerView
 {
     DFPBannerView  *_bannerView;
+    BOOL isAdLoading;
 }
 
 - (void)dealloc
@@ -85,7 +86,9 @@
             [request setLocationWithLatitude:latitude longitude:longitude accuracy:accuracy];
         }
     }
-        
+    
+    isAdLoading = YES;
+
     [_bannerView loadRequest:request];
 }
 
@@ -119,6 +122,9 @@
 /// Tells the delegate an ad request loaded an ad.
 - (void)adViewDidReceiveAd:(DFPBannerView *)adView
 {
+    if (isAdLoading == NO) {
+        return;
+    }
     if (self.onSizeChange) {
         self.onSizeChange(@{
                             @"type": @"banner",
@@ -128,6 +134,7 @@
     if (self.onAdLoaded) {
         self.onAdLoaded(@{});
     }
+    isAdLoading = NO;
 }
 
 /// Tells the delegate an ad request failed.
@@ -137,6 +144,7 @@ didFailToReceiveAdWithError:(GADRequestError *)error
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
     }
+    _bannerView = nil;
 }
 
 /// Tells the delegate that a full screen view will be presented in response

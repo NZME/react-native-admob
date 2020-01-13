@@ -10,14 +10,14 @@
 
 @interface RNNativeAdsAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, DFPBannerAdLoaderDelegate, GADNativeCustomTemplateAdLoaderDelegate, GADVideoControllerDelegate>
 
-/// You must keep a strong reference to the GADAdLoader during the ad loading process.
-@property(nonatomic, strong) GADAdLoader *adLoader;
-
-/// The native ad that is being loaded.
-@property(nonatomic, strong) GADUnifiedNativeAd *nativeAd;
-
-/// The native ad view that is being presented.
-@property(nonatomic, strong) GADUnifiedNativeAdView *nativeAdView;
+///// You must keep a strong reference to the GADAdLoader during the ad loading process.
+//@property(nonatomic, strong) GADAdLoader *adLoader;
+//
+///// The native ad that is being loaded.
+//@property(nonatomic, strong) GADUnifiedNativeAd *nativeAd;
+//
+///// The native ad view that is being presented.
+//@property(nonatomic, strong) GADUnifiedNativeAdView *nativeAdView;
 
 @property (nonatomic, copy) NSString *customTemplateId;
 @property (nonatomic, copy) NSArray *validAdTypes;

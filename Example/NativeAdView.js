@@ -1,23 +1,13 @@
 import React, { Component } from 'react';
-import { Text, View, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import {
   withNativeAd,
   TriggerableView,
 } from 'react-native-admob';
 
-const { width } = Dimensions.get('window');
-
 export class NativeAdView extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      nativeAd: props?.nativeAd,
-    };
-  }
-
   render() {
-    const { nativeAd } = this.state;
-    console.log(nativeAd);
+    const { nativeAd } = this.props;
     if (!['native', 'template'].includes(nativeAd?.type)) {
       return null;
     }

@@ -27,7 +27,7 @@ target 'Example' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  pod 'Google-Mobile-Ads-SDK', '~> 7.8'
+  pod 'Google-Mobile-Ads-SDK', '~> 7.53.1'
 
   target 'ExampleTests' do
     inherit! :search_paths
@@ -37,12 +37,10 @@ target 'Example' do
   use_native_modules!
 end
 
-target 'Example-tvOS' do
+#target 'Example-tvOS' do
   # Pods for Example-tvOS
-
-  target 'Example-tvOSTests' do
-    inherit! :search_paths
+#  target 'Example-tvOSTests' do
+#    inherit! :search_paths
     # Pods for testing
-  end
-
-end
+#  end
+#end
