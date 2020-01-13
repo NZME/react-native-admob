@@ -16,7 +16,6 @@ import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
