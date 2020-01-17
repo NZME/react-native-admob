@@ -15,31 +15,31 @@
 
 @implementation RNDFPBannerView
 {
-    DFPBannerView  *_bannerView;
     BOOL isAdLoading;
 }
 
 - (void)dealloc
 {
-    _bannerView.delegate = nil;
-    _bannerView.adSizeDelegate = nil;
-    _bannerView.appEventDelegate = nil;
+    self.bannerView.delegate = nil;
+    self.bannerView.adSizeDelegate = nil;
+    self.bannerView.appEventDelegate = nil;
+    self.bannerView.rootViewController = nil;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame])) {
         super.backgroundColor = [UIColor clearColor];
-
-        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-        UIViewController *rootViewController = [keyWindow rootViewController];
-
-        _bannerView = [[DFPBannerView alloc] initWithAdSize:kGADAdSizeBanner];
-        _bannerView.delegate = self;
-        _bannerView.adSizeDelegate = self;
-        _bannerView.appEventDelegate = self;
-        _bannerView.rootViewController = rootViewController;
-        [self addSubview:_bannerView];
+        //    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+        //    UIViewController *rootViewController = [keyWindow rootViewController];
+        DFPBannerView *bannerView = [[DFPBannerView alloc] initWithAdSize:kGADAdSizeBanner];
+        self.bannerView = bannerView;
+        self.bannerView.delegate = self;
+        self.bannerView.adSizeDelegate = self;
+        self.bannerView.appEventDelegate = self;
+        self.bannerView.rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+        self.bannerView.translatesAutoresizingMaskIntoConstraints = YES;
+        [self addSubview:self.bannerView];
     }
 
     return self;
@@ -89,7 +89,15 @@
     
     isAdLoading = YES;
 
-    [_bannerView loadRequest:request];
+    GADAdSize adSize = [RCTConvert GADAdSize:_adSize];
+    if (!GADAdSizeEqualToSize(adSize, kGADAdSizeInvalid)) {
+        self.bannerView.adSize = adSize;
+    }
+    
+    self.bannerView.adUnitID = _adUnitID;
+    
+    self.bannerView.validAdSizes = _validAdSizes;
+    [self.bannerView loadRequest:request];
 }
 
 - (void)setValidAdSizes:(NSArray *)adSizes
@@ -103,7 +111,13 @@
             [validAdSizes addObject:NSValueFromGADAdSize(adSize)];
         }
     }];
-    _bannerView.validAdSizes = validAdSizes;
+
+    _validAdSizes = validAdSizes;
+}
+
+- (void)setAdSize:(NSString *)adSize
+{
+    _adSize = adSize;
 }
 
 - (void)setTestDevices:(NSArray *)testDevices
@@ -114,7 +128,7 @@
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    _bannerView.frame = self.bounds;
+    self.bannerView.frame = self.bounds;
 }
 
 # pragma mark GADBannerViewDelegate
@@ -144,7 +158,11 @@ didFailToReceiveAdWithError:(GADRequestError *)error
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
     }
-    _bannerView = nil;
+    self.bannerView.delegate = nil;
+    self.bannerView.adSizeDelegate = nil;
+    self.bannerView.appEventDelegate = nil;
+    self.bannerView.rootViewController = nil;
+    self.bannerView = nil;
 }
 
 /// Tells the delegate that a full screen view will be presented in response

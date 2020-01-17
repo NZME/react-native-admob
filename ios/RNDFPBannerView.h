@@ -4,15 +4,20 @@
 #import "RCTView.h"
 #endif
 
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 @class RCTEventDispatcher;
 
 @interface RNDFPBannerView : RCTView <GADBannerViewDelegate, GADAdSizeDelegate, GADAppEventDelegate>
 
+/// The DFP banner view.
+@property(nonatomic, weak) IBOutlet DFPBannerView *bannerView;
+
 @property (nonatomic, copy) NSArray *validAdSizes;
 @property (nonatomic, copy) NSArray *testDevices;
 @property (nonatomic, copy) NSDictionary *targeting;
+@property (nonatomic, copy) NSString *adSize;
+@property (strong, nonatomic) NSString *adUnitID;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onSizeChange;
 @property (nonatomic, copy) RCTBubblingEventBlock onAppEvent;

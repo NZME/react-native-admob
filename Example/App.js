@@ -5,7 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  RefreshControl
 } from 'react-native';
 import {
   AdMobBanner,
@@ -31,6 +32,8 @@ export default class Example extends Component {
     super();
     this.state = {
       fluidSizeIndex: 0,
+      adsList: [],
+      refreshingScrollView: false,
     };
   }
 
@@ -56,6 +59,11 @@ export default class Example extends Component {
     );
 
     AdMobInterstitial.requestAd().catch(error => console.warn(error));
+
+    const adsList = [
+      {type: 'banner'},
+    ];
+    this.setState({ adsList: adsList });
   }
 
   componentWillUnmount() {
@@ -75,14 +83,14 @@ export default class Example extends Component {
     // console.log(nativeAd);
   };
 
-  showBanner = adsManager => {
-    return <BannerExample title="DFP - Fluid Ad Size">
+  showBanner = (adsManager, index) => {
+    return <BannerExample title={`${index}. DFP - Fluid Ad Size`}>
       <View
         style={[
           { backgroundColor: '#f3f', paddingVertical: 10 },
           {alignItems: 'center', width: '100%'}
         ]}>
-        <NativeAdView
+        {/*<NativeAdView
           targeting={{
             customTargeting: { group: 'nzme_user_test' },
             categoryExclusions: ['media'],
@@ -100,27 +108,27 @@ export default class Example extends Component {
           onAdFailedToLoad={error => {
             console.log(error);
           }}
+        />*/}
+        <PublisherBanner
+          onAdLoaded={this.onAdLoaded}
+          adSize="mediumRectangle"
+          validAdSizes={['mediumRectangle']}
+          adUnitID={'/83069739/jeff'}
+          targeting={{
+            customTargeting: { group: 'nzme_user_test' },
+            categoryExclusions: ['media'],
+            contentURL: 'nzmetest://',
+            publisherProvidedID: 'provider_id_nzme',
+          }}
         />
-        {/*<PublisherBanner*/}
-        {/*  onAdLoaded={this.onAdLoaded}*/}
-        {/*  adSize="mediumRectangle"*/}
-        {/*  validAdSizes={['mediumRectangle']}*/}
-        {/*  adUnitID={'/83069739/jeff'}*/}
-        {/*  targeting={{*/}
-        {/*    customTargeting: { group: 'nzme_user_test' },*/}
-        {/*    categoryExclusions: ['media'],*/}
-        {/*    contentURL: 'nzmetest://',*/}
-        {/*    publisherProvidedID: 'provider_id_nzme',*/}
-        {/*  }}*/}
-        {/*/>*/}
       </View>
     </BannerExample>;
   };
 
-  showNative = adsManager => {
+  showNative = (adsManager, index) => {
     return <BannerExample
       style={{ padding: 20}}
-      title="DFP - Native ad">
+      title={`${index}. DFP - Native ad`}>
       <View style={{alignItems: 'center', width: '100%'}}>
         <NativeAdView
           targeting={{
@@ -144,21 +152,37 @@ export default class Example extends Component {
     </BannerExample>;
   };
 
+  addAd = type => {
+    const { adsList } = this.state;
+    if (type === 'banner') {
+      adsList.push({type: 'banner'});
+    } else {
+      adsList.push({type: 'native'});
+    }
+    this.setState({ adsList: adsList });
+  };
+
+  onRefreshScrollView = () => {
+    const adsList = [
+      {type: 'banner'},
+    ];
+    this.setState({ adsList: adsList });
+  };
+
   render() {
     // const adsManager = new NativeAdsManager("/6499/example/native", [AdMobInterstitial.simulatorId]);
     const adsManager = new NativeAdsManager("/83069739/jeff", [AdMobInterstitial.simulatorId]);
-    const adsList = [
-      {type: 'banner'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-      {type: 'native'},
-    ];
+    const { adsList, refreshingScrollView } = this.state;
 
     return (
       <View style={styles.container}>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshingScrollView}
+              onRefresh={this.onRefreshScrollView}
+            />
+          }>
           <BannerExample title="Interstitial">
             <Button
               title="Show Interstitial and preload next"
@@ -167,11 +191,25 @@ export default class Example extends Component {
           </BannerExample>
           {adsList?.map((curItem, index) => {
             if (curItem.type === 'banner') {
-              return <View key={index}>{this.showBanner(adsManager)}</View>;
+              return <View key={index}>{this.showBanner(adsManager, index+1)}</View>;
             } else {
-              return <View key={index}>{this.showNative(adsManager)}</View>;
+              return <View key={index}>{this.showNative(adsManager, index+1)}</View>;
             }
           })}
+          <BannerExample
+            title="Add more adds"
+            style={{ paddingBottom: 40 }}>
+            <Button
+              title="Add Banner"
+              onPress={() => this.addAd('banner')}
+              style={styles.button}
+            />
+            <Button
+              title="Add Native"
+              onPress={() => this.addAd('native')}
+              style={styles.button}
+            />
+          </BannerExample>
         </ScrollView>
       </View>
     );

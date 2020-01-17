@@ -2,7 +2,7 @@
 
 #import "RNAdMobRequestConfig.h"
 
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 @implementation RNAdMobRequestConfig
 

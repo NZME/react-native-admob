@@ -4,20 +4,26 @@
 #import <React/RCTBridge.h>
 #import <React/RCTComponent.h>
 
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 @class RCTEventDispatcher;
 
 @interface RNNativeAdsAdView : RCTView <GADUnifiedNativeAdLoaderDelegate, GADUnifiedNativeAdDelegate, DFPBannerAdLoaderDelegate, GADNativeCustomTemplateAdLoaderDelegate, GADVideoControllerDelegate>
 
-///// You must keep a strong reference to the GADAdLoader during the ad loading process.
-//@property(nonatomic, strong) GADAdLoader *adLoader;
-//
-///// The native ad that is being loaded.
-//@property(nonatomic, strong) GADUnifiedNativeAd *nativeAd;
-//
-///// The native ad view that is being presented.
-//@property(nonatomic, strong) GADUnifiedNativeAdView *nativeAdView;
+/// You must keep a strong reference to the GADAdLoader during the ad loading process.
+@property(nonatomic, weak) IBOutlet GADAdLoader *adLoader;
+
+/// The native ad that is being loaded.
+@property(nonatomic, weak) IBOutlet GADUnifiedNativeAd *nativeAd;
+
+/// The native ad view
+@property(nonatomic, weak) IBOutlet GADUnifiedNativeAdView *nativeAdView;
+
+/// The DFP banner view.
+@property(nonatomic, weak) IBOutlet DFPBannerView *bannerView;
+
+/// The native custom template ad
+@property(nonatomic, weak) IBOutlet GADNativeCustomTemplateAd *nativeCustomTemplateAd;
 
 @property (nonatomic, copy) NSString *customTemplateId;
 @property (nonatomic, copy) NSArray *validAdTypes;

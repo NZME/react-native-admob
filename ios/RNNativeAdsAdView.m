@@ -15,32 +15,34 @@ static NSString *const kAdTypeTemplate = @"template";
 
 @implementation RNNativeAdsAdView
 {
-    /// You must keep a strong reference to the GADAdLoader during the ad loading process.
-    GADAdLoader *_adLoader;
-    /// The native ad that is being loaded.
-    GADUnifiedNativeAd *_nativeAd;
-    /// The native ad view that is being presented.
-    GADUnifiedNativeAdView *_nativeAdView;
-    DFPBannerView *_bannerView;
-    GADNativeCustomTemplateAd *_nativeCustomTemplateAd;
     NSString *_nativeCustomTemplateAdClickableAsset;
     NSString *_adUnitID;
     NSArray *_testDevices;
 }
 
+static GADAdLoader *al;
+
 - (void)dealloc
 {
-    _adLoader.delegate = nil;
-    _nativeAd.delegate = nil;
-//    _bannerView.delegate = nil;
-//    _bannerView.adSizeDelegate = nil;
-//    _bannerView.appEventDelegate = nil;
+    self.adLoader.delegate = nil;
+    self.adLoader = nil;
+    self.nativeAd.delegate = nil;
+    self.nativeAd = nil;
+    
+    self.nativeAdView = nil;
+    
+    self.bannerView.delegate = nil;
+    self.bannerView.adSizeDelegate = nil;
+    self.bannerView.appEventDelegate = nil;
+    self.bannerView.rootViewController = nil;
+    self.bannerView = nil;
 }
 
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    _nativeAdView.frame = self.bounds;
+    self.nativeAdView.frame = self.bounds;
+    self.bannerView.frame = self.bounds;
 }
 
 - (void)loadAd:(RNNativeAdsManager *)adManager {
@@ -55,34 +57,11 @@ static NSString *const kAdTypeTemplate = @"template";
         ];
     }
 
-    // Loads an ad for any of app install, content, or custom native ads.
-    NSMutableArray *adTypes = [[NSMutableArray alloc] init];
-    if ([_validAdTypes containsObject:kAdTypeNative]) {
-        [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
-    }
-    if ((_validAdSizes != nil || _adSize != nil) && [_validAdTypes containsObject:kAdTypeBanner]) {
-        [adTypes addObject:kGADAdLoaderAdTypeDFPBanner];
-    }
-    if (_customTemplateId != nil && [_validAdTypes containsObject:kAdTypeTemplate]) {
-        [adTypes addObject:kGADAdLoaderAdTypeNativeCustomTemplate];
-    }
-
-    GADVideoOptions *videoOptions = [[GADVideoOptions alloc] init];
-    videoOptions.startMuted = true;
-
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-    UIViewController *rootViewController = [keyWindow rootViewController];
-
-    _adLoader = [[GADAdLoader alloc] initWithAdUnitID:_adUnitID
-                                       rootViewController:rootViewController
-                                                  adTypes:adTypes
-                                                  options:@[ videoOptions ]];
-
-    _adLoader.delegate = self;
+    self.adLoader = [adManager getAdLoader:_adUnitID validAdTypes:_validAdTypes];
+    self.adLoader.delegate = self;
 
     GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = _testDevices;
     DFPRequest *request = [DFPRequest request];
-
 
     if (_targeting != nil) {
         NSDictionary *customTargeting = [_targeting objectForKey:@"customTargeting"];
@@ -114,11 +93,11 @@ static NSString *const kAdTypeTemplate = @"template";
         }
     }
 
-    [_adLoader loadRequest:request];
+    [self.adLoader loadRequest:request];
 }
 
 - (void)reloadAd {
-    if (_adLoader == nil) {
+    if (self.adLoader == nil) {
         return;
     }
 
@@ -155,7 +134,7 @@ static NSString *const kAdTypeTemplate = @"template";
         }
     }
 
-    [_adLoader loadRequest:request];
+    [self.adLoader loadRequest:request];
 }
 
 - (void)setCustomTemplateId:(NSString *)customTemplateId
@@ -198,46 +177,66 @@ static NSString *const kAdTypeTemplate = @"template";
     if (self.onAdFailedToLoad) {
         self.onAdFailedToLoad(@{ @"error": @{ @"message": [error localizedDescription] } });
     }
-    _nativeAdView = nil;
-    _bannerView = nil;
-    _nativeCustomTemplateAd = nil;
-    if (_adLoader != nil) {
-        _adLoader.delegate = nil;
-        _adLoader = nil;
+    
+    self.nativeAdView = nil;
+    
+    
+    if (self.bannerView != nil) {
+        self.bannerView.delegate = nil;
+        self.bannerView.adSizeDelegate = nil;
+        self.bannerView.appEventDelegate = nil;
+        self.bannerView.rootViewController = nil;
+        self.bannerView = nil;
     }
-    if (_nativeAd != nil) {
-        _nativeAd.delegate = nil;
-        _nativeAd = nil;
+    
+    self.nativeCustomTemplateAd = nil;
+
+    if (self.adLoader != nil) {
+        self.adLoader.delegate = nil;
+        self.adLoader = nil;
+    }
+    
+    if (self.nativeAd != nil) {
+        self.nativeAd.delegate = nil;
+        self.nativeAd = nil;
     }
 }
 
 #pragma mark GADUnifiedNativeAdLoaderDelegate implementation
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveUnifiedNativeAd:(GADUnifiedNativeAd *)nativeAd {
-    [_bannerView removeFromSuperview];
-    [_nativeAdView removeFromSuperview];
+    [self.bannerView removeFromSuperview];
+    [self.nativeAdView removeFromSuperview];
 
-    _nativeAdView = [[GADUnifiedNativeAdView alloc] init];
+    GADUnifiedNativeAdView *nativeAdView = [[GADUnifiedNativeAdView alloc] init];
+    self.nativeAdView = nativeAdView;
+    self.nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
+    self.nativeAdView.clipsToBounds = YES;
 
-    _nativeAdView.translatesAutoresizingMaskIntoConstraints = NO;
-    _nativeAdView.contentMode = UIViewContentModeScaleAspectFit;
-    _nativeAdView.clipsToBounds = YES;
+    self.nativeAd = nativeAd;
+    self.nativeAdView.nativeAd = _nativeAd;
 
-    _nativeAd = nativeAd;
-    _nativeAdView.nativeAd = _nativeAd;
-
-    [self addSubview:_nativeAdView];
+    [self addSubview:self.nativeAdView];
 
     // Set ourselves as the ad delegate to be notified of native ad events.
-    _nativeAd.delegate = self;
+    self.nativeAd.delegate = self;
 
-    [self triggerAdLoadedEvent:_nativeAd];
+    [self triggerAdLoadedEvent:self.nativeAd];
 
-    _bannerView = nil;
-    _nativeCustomTemplateAd = nil;
-    if (_adLoader != nil) {
-        _adLoader.delegate = nil;
-        _adLoader = nil;
+    if (self.bannerView != nil) {
+        self.bannerView.delegate = nil;
+        self.bannerView.adSizeDelegate = nil;
+        self.bannerView.appEventDelegate = nil;
+        self.bannerView.rootViewController = nil;
+        self.bannerView = nil;
+    }
+    
+    self.nativeCustomTemplateAd = nil;
+    
+    if (self.adLoader != nil) {
+        self.adLoader.delegate = nil;
+        self.adLoader = nil;
     }
 }
 
@@ -300,11 +299,12 @@ static NSString *const kAdTypeTemplate = @"template";
 
 - (void)adLoader:(nonnull GADAdLoader *)adLoader
 didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
-    [_bannerView removeFromSuperview];
-    [_nativeAdView removeFromSuperview];
-    _bannerView = bannerView;
+    [self.bannerView removeFromSuperview];
+    [self.nativeAdView removeFromSuperview];
+    self.bannerView = bannerView;
+    self.bannerView.translatesAutoresizingMaskIntoConstraints = YES;
 
-    [self addSubview:bannerView];
+    [self addSubview:self.bannerView];
 
 //    bannerView.delegate = self;
 //    bannerView.adSizeDelegate = self;
@@ -313,25 +313,28 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
     if (self.onSizeChange) {
         self.onSizeChange(@{
                             @"type": kAdTypeBanner,
-                            @"width": @(bannerView.frame.size.width),
-                            @"height": @(bannerView.frame.size.height) });
+                            @"width": @(self.bannerView.frame.size.width),
+                            @"height": @(self.bannerView.frame.size.height) });
     }
     if (self.onAdLoaded) {
         self.onAdLoaded(@{
             @"type": kAdTypeBanner,
-            @"gadSize": NSValueFromGADAdSize(bannerView.adSize),
+            @"gadSize": NSValueFromGADAdSize(self.bannerView.adSize),
         });
     }
 
-    _nativeAdView = nil;
-    _nativeCustomTemplateAd = nil;
-    if (_adLoader != nil) {
-        _adLoader.delegate = nil;
-        _adLoader = nil;
+    self.nativeAdView = nil;
+    
+    self.nativeCustomTemplateAd = nil;
+    
+    if (self.adLoader != nil) {
+        self.adLoader.delegate = nil;
+        self.adLoader = nil;
     }
-    if (_nativeAd != nil) {
-        _nativeAd.delegate = nil;
-        _nativeAd = nil;
+    
+    if (self.nativeAd != nil) {
+        self.nativeAd.delegate = nil;
+        self.nativeAd = nil;
     }
 }
 
@@ -339,24 +342,33 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 
 - (void)adLoader:(GADAdLoader *)adLoader
     didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
-    [_bannerView removeFromSuperview];
-    [_nativeAdView removeFromSuperview];
+    [self.bannerView removeFromSuperview];
+    [self.nativeAdView removeFromSuperview];
 
-    _nativeCustomTemplateAd = nativeCustomTemplateAd;
+    self.nativeCustomTemplateAd = nativeCustomTemplateAd;
 
-    [self triggerCustomAdLoadedEvent:_nativeCustomTemplateAd];
+    [self triggerCustomAdLoadedEvent:self.nativeCustomTemplateAd];
 
-    [_nativeCustomTemplateAd recordImpression];
+    [self.nativeCustomTemplateAd recordImpression];
 
-    _nativeAdView = nil;
-    _bannerView = nil;
-    if (_adLoader != nil) {
-        _adLoader.delegate = nil;
-        _adLoader = nil;
+    self.nativeAdView = nil;
+    
+    if (self.bannerView != nil) {
+        self.bannerView.delegate = nil;
+        self.bannerView.adSizeDelegate = nil;
+        self.bannerView.appEventDelegate = nil;
+        self.bannerView.rootViewController = nil;
+        self.bannerView = nil;
     }
-    if (_nativeAd != nil) {
-        _nativeAd.delegate = nil;
-        _nativeAd = nil;
+    
+    if (self.adLoader != nil) {
+        self.adLoader.delegate = nil;
+        self.adLoader = nil;
+    }
+    
+    if (self.nativeAd != nil) {
+        self.nativeAd.delegate = nil;
+        self.nativeAd = nil;
     }
 }
 
@@ -431,26 +443,26 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 }
 
 - (void)registerViewsForInteraction:(NSArray<UIView *> *)clickableViews {
-    if (_nativeCustomTemplateAd != nil && _nativeCustomTemplateAdClickableAsset != nil) {
+    if (self.nativeCustomTemplateAd != nil && _nativeCustomTemplateAdClickableAsset != nil) {
         [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
             [view addGestureRecognizer:[[UITapGestureRecognizer alloc]
                                         initWithTarget:self
                                         action:@selector(performClickOnCustomAd)]];
             view.userInteractionEnabled = YES;
         }];
-    } else if (_nativeAdView != nil) {
+    } else if (self.nativeAdView != nil) {
         [clickableViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, __unused BOOL *stop) {
             [view removeFromSuperview];
             view.userInteractionEnabled = NO;
-            [_nativeAdView addSubview:view];
-            _nativeAdView.callToActionView = view;
+            [self.nativeAdView addSubview:view];
+            self.nativeAdView.callToActionView = view;
         }];
     }
 }
 
 - (void)performClickOnCustomAd {
-    if (_nativeCustomTemplateAd != nil) {
-        [_nativeCustomTemplateAd performClickOnAssetWithKey:_nativeCustomTemplateAdClickableAsset];
+    if (self.nativeCustomTemplateAd != nil) {
+        [self.nativeCustomTemplateAd performClickOnAssetWithKey:_nativeCustomTemplateAdClickableAsset];
     }
 }
 
@@ -458,11 +470,11 @@ didReceiveDFPBannerView:(nonnull DFPBannerView *)bannerView {
 #pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
-    if (_nativeAdView != nil) {
+    if (self.nativeAdView != nil) {
         [subview removeFromSuperview];
         subview.userInteractionEnabled = NO;
-        [_nativeAdView addSubview:subview];
-        _nativeAdView.callToActionView = subview;
+        [self.nativeAdView addSubview:subview];
+        self.nativeAdView.callToActionView = subview;
     } else {
         [super insertReactSubview:subview atIndex:atIndex];
     }

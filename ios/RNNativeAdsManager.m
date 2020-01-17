@@ -10,9 +10,12 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTBridgeModule.h>
 
+#import <React/RCTLog.h>
+
 @interface RNNativeAdsManager ()
 
-@property (nonatomic, strong) NSMutableDictionary<NSString*, RNNativeAdsManager*> *adsManagers;
+//@property (nonatomic, strong) NSMutableDictionary<NSString*, RNNativeAdsManager*> *adsManagers;
+//@property (nonatomic, strong) NSMutableDictionary<NSString*, GADAdLoader*> *adLoaders;
 @property (nonatomic, strong) NSString *myAdChoiceViewAdUnitID;
 
 @end
@@ -27,10 +30,18 @@ RCT_EXPORT_MODULE(RNNativeAdsManager)
 {
   self = [super init];
   if (self) {
-    _adsManagers = [NSMutableDictionary new];
+      if (adsManagers == nil) {
+          adsManagers = [NSMutableDictionary new];
+      }
+      if (adLoaders == nil) {
+          adLoaders = [NSMutableDictionary new];
+      }
   }
   return self;
 }
+
+static NSMutableDictionary<NSString*, RNNativeAdsManager*> *adsManagers;
+static NSMutableDictionary<NSString*, GADAdLoader*> *adLoaders;
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -81,12 +92,53 @@ RCT_EXPORT_METHOD(init:(NSString *)adUnitID testDevices:(NSArray *)testDevices)
     
     _myAdChoiceViewAdUnitID = adUnitID;
 
-    [_adsManagers setValue:adsManager forKey:adUnitID];
+    [adsManagers setValue:adsManager forKey:adUnitID];
 }
 
 - (RNNativeAdsManager *) getAdsManager:(NSString *)adUnitID
 {
-    return _adsManagers[adUnitID];
+    return adsManagers[adUnitID];
+}
+
+- (GADAdLoader *) getAdLoader:(NSString *)adUnitID validAdTypes:(NSArray *)validAdTypes
+{
+    NSString *adLoaderKey = adUnitID;
+    if ([validAdTypes containsObject:@"native"]) {
+        adLoaderKey = [NSString stringWithFormat:@"%@%@", adLoaderKey, @"native"];
+    }
+    if ([validAdTypes containsObject:@"banner"]) {
+        adLoaderKey = [NSString stringWithFormat:@"%@%@", adLoaderKey, @"banner"];
+    }
+    if ([validAdTypes containsObject:@"template"]) {
+        adLoaderKey = [NSString stringWithFormat:@"%@%@", adLoaderKey, @"template"];
+    }
+
+    GADAdLoader *adLoader = [adLoaders objectForKey:adLoaderKey];
+    if (adLoader == nil) {
+        // Loads an ad for any of app install, content, or custom native ads.
+        NSMutableArray *adTypes = [[NSMutableArray alloc] init];
+        if ([validAdTypes containsObject:@"native"]) {
+            [adTypes addObject:kGADAdLoaderAdTypeUnifiedNative];
+        }
+        if ([validAdTypes containsObject:@"banner"]) {
+            [adTypes addObject:kGADAdLoaderAdTypeDFPBanner];
+        }
+        if ([validAdTypes containsObject:@"template"]) {
+            [adTypes addObject:kGADAdLoaderAdTypeNativeCustomTemplate];
+        }
+
+        GADVideoOptions *videoOptions = [[GADVideoOptions alloc] init];
+        videoOptions.startMuted = YES;
+
+        adLoader = [[GADAdLoader alloc] initWithAdUnitID:adUnitID
+                                           rootViewController:[UIApplication sharedApplication].delegate.window.rootViewController
+                                                      adTypes:adTypes
+                                                      options:@[ videoOptions ]];
+
+        [adLoaders setValue:adLoader forKey:adLoaderKey];
+    }
+
+    return adLoader;
 }
 
 @end

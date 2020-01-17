@@ -31,8 +31,8 @@ RCT_EXPORT_METHOD(reloadAd:(nonnull NSNumber *)reactTag)
 
 RCT_CUSTOM_VIEW_PROPERTY(adsManager, NSString, RNNativeAdsAdView)
 {
-    RNNativeAdsManager *nativeAdManager = [_bridge moduleForClass:[RNNativeAdsManager class]];
-    RNNativeAdsManager *_adsManager = [nativeAdManager getAdsManager:json];
+//    RNNativeAdsManager *nativeAdManager = [_bridge moduleForClass:[RNNativeAdsManager class]];
+    RNNativeAdsManager *_adsManager = [[_bridge moduleForClass:[RNNativeAdsManager class]] getAdsManager:json];
     [view loadAd:_adsManager];
 }
 

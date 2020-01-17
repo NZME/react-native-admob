@@ -6,7 +6,7 @@
 #import "RCTEventEmitter.h"
 #endif
 
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 @interface RNAdMobRewarded : RCTEventEmitter <RCTBridgeModule, GADRewardBasedVideoAdDelegate>
 @end
